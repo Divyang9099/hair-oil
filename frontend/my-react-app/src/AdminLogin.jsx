@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import './App.css'
 
 function AdminLogin({ onLogin }) {
@@ -26,7 +27,7 @@ function AdminLogin({ onLogin }) {
     setError('')
 
     try {
-      const response = await fetch('http://localhost:3000/api/admin/login', {
+      const response = await fetch('https://hair-oil.onrender.com/api/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,13 +55,46 @@ function AdminLogin({ onLogin }) {
   }
 
   return (
-    <div className="admin-login-container">
-      <div className="admin-login-box">
-        <h2 className="admin-login-title">એડમિન લોગિન</h2>
-        <form onSubmit={handleSubmit} className="admin-login-form">
-          <div className="form-group">
+    <motion.div 
+      className="admin-login-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div 
+        className="admin-login-box"
+        initial={{ opacity: 0, scale: 0.8, y: 50 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ 
+          type: "spring",
+          stiffness: 100,
+          damping: 15,
+          duration: 0.6
+        }}
+      >
+        <motion.h2 
+          className="admin-login-title"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          એડમિન લોગિન
+        </motion.h2>
+        <motion.form 
+          onSubmit={handleSubmit} 
+          className="admin-login-form"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <motion.div 
+            className="form-group"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
             <label htmlFor="adminId">ID *</label>
-            <input
+            <motion.input
               type="text"
               id="adminId"
               name="id"
@@ -68,11 +102,18 @@ function AdminLogin({ onLogin }) {
               placeholder="તમારું ID દાખલ કરો"
               value={credentials.id}
               onChange={handleChange}
+              whileFocus={{ scale: 1.02, borderColor: "var(--dark-gold)" }}
+              transition={{ duration: 0.2 }}
             />
-          </div>
-          <div className="form-group">
+          </motion.div>
+          <motion.div 
+            className="form-group"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
+          >
             <label htmlFor="adminPassword">પાસવર્ડ *</label>
-            <input
+            <motion.input
               type="password"
               id="adminPassword"
               name="password"
@@ -80,19 +121,52 @@ function AdminLogin({ onLogin }) {
               placeholder="તમારું પાસવર્ડ દાખલ કરો"
               value={credentials.password}
               onChange={handleChange}
+              whileFocus={{ scale: 1.02, borderColor: "var(--dark-gold)" }}
+              transition={{ duration: 0.2 }}
             />
-          </div>
+          </motion.div>
           {error && (
-            <div className="error-message">
+            <motion.div 
+              className="error-message"
+              initial={{ opacity: 0, y: -10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.9 }}
+              transition={{ 
+                type: "spring",
+                stiffness: 200,
+                damping: 15
+              }}
+            >
               {error}
-            </div>
+            </motion.div>
           )}
-          <button type="submit" className="btn-secondary" disabled={isLoading}>
-            {isLoading ? 'લોગિન થઈ રહ્યું છે...' : 'લોગિન કરો'}
-          </button>
-        </form>
-      </div>
-    </div>
+          <motion.button 
+            type="submit" 
+            className="btn-secondary" 
+            disabled={isLoading}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.6 }}
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: "0 6px 20px rgba(139, 69, 19, 0.4)"
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {isLoading ? (
+              <motion.span
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                લોગિન થઈ રહ્યું છે...
+              </motion.span>
+            ) : (
+              'લોગિન કરો'
+            )}
+          </motion.button>
+        </motion.form>
+      </motion.div>
+    </motion.div>
   )
 }
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import './App.css'
 
 function AdminDashboard({ onLogout }) {
@@ -15,7 +16,7 @@ function AdminDashboard({ onLogout }) {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/orders')
+      const response = await fetch('https://hair-oil.onrender.com/api/orders')
       if (response.ok) {
         const data = await response.json()
         setOrders(data.orders || [])
@@ -47,7 +48,7 @@ function AdminDashboard({ onLogout }) {
     const newStatus = !currentStatus
     
     try {
-      const url = `http://localhost:3000/api/orders/${orderId}`
+      const url = `https://hair-oil.onrender.com/api/orders/${orderId}`
       console.log('Request URL:', url)
       
       const response = await fetch(url, {
@@ -98,88 +99,345 @@ function AdminDashboard({ onLogout }) {
   const pendingOrders = orders.filter(order => !order.status).length
   const completedOrders = orders.filter(order => order.status).length
 
+  const statCardVariants = {
+    hidden: { opacity: 0, scale: 0.8, y: 30 },
+    visible: (i) => ({
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+        duration: 0.5
+      }
+    }),
+    hover: {
+      scale: 1.05,
+      y: -5,
+      transition: {
+        duration: 0.3,
+        type: "spring",
+        stiffness: 400
+      }
+    }
+  }
+
   return (
-    <div className="admin-dashboard">
-      <header className="admin-header">
+    <motion.div 
+      className="admin-dashboard"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.header 
+        className="admin-header"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ 
+          type: "spring",
+          stiffness: 100,
+          damping: 15,
+          duration: 0.6
+        }}
+      >
         <div className="container">
           <div className="admin-header-content">
-            <h1 className="admin-logo">એડમિન ડેશબોર્ડ</h1>
-            <button onClick={handleLogout} className="btn-logout">
+            <motion.h1 
+              className="admin-logo"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              એડમિન ડેશબોર્ડ
+            </motion.h1>
+            <motion.button 
+              onClick={handleLogout} 
+              className="btn-logout"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: "0 6px 20px rgba(139, 69, 19, 0.4)"
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
               લોગઆઉટ
-            </button>
+            </motion.button>
           </div>
         </div>
-      </header>
+      </motion.header>
 
-      <div className="admin-stats">
+      <motion.div 
+        className="admin-stats"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
         <div className="container">
           <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon">📦</div>
+            <motion.div 
+              className="stat-card"
+              variants={statCardVariants}
+              initial="hidden"
+              animate="visible"
+              custom={0}
+              whileHover="hover"
+            >
+              <motion.div 
+                className="stat-icon"
+                animate={{ 
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+              >
+                📦
+              </motion.div>
               <div className="stat-info">
                 <h3>કુલ ઓર્ડર</h3>
-                <p className="stat-number">{totalOrders}</p>
+                <motion.p 
+                  className="stat-number"
+                  key={totalOrders}
+                  initial={{ scale: 1.3, color: '#FFD700' }}
+                  animate={{ scale: 1, color: 'var(--cream-beige)' }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 15
+                  }}
+                >
+                  {totalOrders}
+                </motion.p>
               </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">⏳</div>
+            </motion.div>
+            <motion.div 
+              className="stat-card"
+              variants={statCardVariants}
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              whileHover="hover"
+            >
+              <motion.div 
+                className="stat-icon"
+                animate={{ 
+                  rotate: [0, -10, 10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+              >
+                ⏳
+              </motion.div>
               <div className="stat-info">
                 <h3>પેન્ડિંગ</h3>
-                <p className="stat-number">{pendingOrders}</p>
+                <motion.p 
+                  className="stat-number"
+                  key={pendingOrders}
+                  initial={{ scale: 1.3, color: '#FFD700' }}
+                  animate={{ scale: 1, color: 'var(--cream-beige)' }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 15
+                  }}
+                >
+                  {pendingOrders}
+                </motion.p>
               </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">✅</div>
+            </motion.div>
+            <motion.div 
+              className="stat-card"
+              variants={statCardVariants}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+              whileHover="hover"
+            >
+              <motion.div 
+                className="stat-icon"
+                animate={{ 
+                  rotate: [0, 15, -15, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+              >
+                ✅
+              </motion.div>
               <div className="stat-info">
                 <h3>પૂર્ણ થયેલ</h3>
-                <p className="stat-number">{completedOrders}</p>
+                <motion.p 
+                  className="stat-number"
+                  key={completedOrders}
+                  initial={{ scale: 1.3, color: '#FFD700' }}
+                  animate={{ scale: 1, color: 'var(--cream-beige)' }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 15
+                  }}
+                >
+                  {completedOrders}
+                </motion.p>
               </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">💰</div>
+            </motion.div>
+            <motion.div 
+              className="stat-card"
+              variants={statCardVariants}
+              initial="hidden"
+              animate="visible"
+              custom={3}
+              whileHover="hover"
+            >
+              <motion.div 
+                className="stat-icon"
+                animate={{ 
+                  rotate: [0, -15, 15, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+              >
+                💰
+              </motion.div>
               <div className="stat-info">
                 <h3>કુલ આવક</h3>
-                <p className="stat-number">₹{totalRevenue.toLocaleString('en-IN')}</p>
+                <motion.p 
+                  className="stat-number"
+                  key={totalRevenue}
+                  initial={{ scale: 1.3, color: '#FFD700' }}
+                  animate={{ scale: 1, color: 'var(--cream-beige)' }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 15
+                  }}
+                >
+                  ₹{totalRevenue.toLocaleString('en-IN')}
+                </motion.p>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="admin-content">
+      <motion.div 
+        className="admin-content"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+      >
         <div className="container">
-          <div className="admin-controls">
-            <h2 className="section-title">બધા ઓર્ડર</h2>
-            <div className="filter-buttons">
-              <button
+          <motion.div 
+            className="admin-controls"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+          >
+            <motion.h2 
+              className="section-title"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+            >
+              બધા ઓર્ડર
+            </motion.h2>
+            <motion.div 
+              className="filter-buttons"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
+            >
+              <motion.button
                 className={filterStatus === 'all' ? 'filter-btn active' : 'filter-btn'}
                 onClick={() => setFilterStatus('all')}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400 }}
               >
                 બધા
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 className={filterStatus === 'pending' ? 'filter-btn active' : 'filter-btn'}
                 onClick={() => setFilterStatus('pending')}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400 }}
               >
                 પેન્ડિંગ
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 className={filterStatus === 'completed' ? 'filter-btn active' : 'filter-btn'}
                 onClick={() => setFilterStatus('completed')}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400 }}
               >
                 પૂર્ણ થયેલ
-              </button>
-            </div>
-          </div>
+              </motion.button>
+            </motion.div>
+          </motion.div>
 
           {isLoading ? (
-            <div className="loading-message">લોડ થઈ રહ્યું છે...</div>
+            <motion.div 
+              className="loading-message"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.span
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                લોડ થઈ રહ્યું છે...
+              </motion.span>
+            </motion.div>
           ) : error ? (
-            <div className="error-message">{error}</div>
+            <motion.div 
+              className="error-message"
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                type: "spring",
+                stiffness: 200,
+                damping: 15
+              }}
+            >
+              {error}
+            </motion.div>
           ) : filteredOrders.length === 0 ? (
-            <div className="no-orders">કોઈ ઓર્ડર મળ્યા નથી</div>
+            <motion.div 
+              className="no-orders"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              કોઈ ઓર્ડર મળ્યા નથી
+            </motion.div>
           ) : (
-            <div className="orders-table-container">
+            <motion.div 
+              className="orders-table-container"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1 }}
+            >
               <table className="orders-table">
                 <thead>
                   <tr>
@@ -197,7 +455,20 @@ function AdminDashboard({ onLogout }) {
                 </thead>
                 <tbody>
                   {filteredOrders.map((order, index) => (
-                    <tr key={order._id || index}>
+                    <motion.tr 
+                      key={order._id || index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        duration: 0.3,
+                        delay: index * 0.05
+                      }}
+                      whileHover={{ 
+                        backgroundColor: "var(--cream-beige)",
+                        scale: 1.01,
+                        transition: { duration: 0.2 }
+                      }}
+                    >
                       <td>{index + 1}</td>
                       <td>{order.name || 'N/A'}</td>
                       <td>{order.phone || 'N/A'}</td>
@@ -208,24 +479,32 @@ function AdminDashboard({ onLogout }) {
                       <td className="total-cell">₹{order.total || 0}</td>
                       <td>{formatDate(order.date)}</td>
                       <td>
-                        <label className="toggle-switch">
+                        <motion.label 
+                          className="toggle-switch"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
                           <input
                             type="checkbox"
                             checked={order.status || false}
                             onChange={() => handleStatusChange(order._id, order.status)}
                           />
-                          <span className="toggle-slider"></span>
-                        </label>
+                          <motion.span 
+                            className="toggle-slider"
+                            animate={order.status ? { backgroundColor: "var(--deep-green)" } : { backgroundColor: "#ffa500" }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </motion.label>
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
-            </div>
+            </motion.div>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 

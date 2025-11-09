@@ -754,3 +754,357 @@ footer {
         overflow-x: scroll;
     }
 }
+/* App.css (અથવા તમારી સ્ટાઇલ ફાઇલ) માં ઉમેરો/સુધારો */
+
+/* Benefit Card Hover માટે CSS ટ્રાન્ઝિશન */
+.benefit-card {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    /*... અન્ય સ્ટાઇલ ...*/
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* ઉમેરો */
+}
+
+/* જ્યારે framer-motion તેને ઊંચો કરે ત્યારે આ દેખાશે */
+.benefit-card:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); 
+}
+
+/* Order Container Cards માટે */
+.product-card, .order-form {
+    transition: box-shadow 0.3s ease;
+    /*... અન્ય સ્ટાઇલ ...*/
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* ઉમેરો */
+}
+
+/* સફળતા સંદેશને વધુ સારો લૂક આપો */
+.success-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--deep-green); /* assumed variable */
+    color: white;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    /* framer-motion માટે તૈયાર છે */
+    overflow: hidden; 
+}
+
+/* Additional CSS Animations and Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Enhanced transitions for interactive elements */
+a, button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Loading animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* Gradient animation for backgrounds */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animated-gradient {
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+}
+
+/* Enhanced hover effects */
+.nav-links a {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #FFD700;
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::before {
+    width: 100%;
+}
+
+/* Button ripple effect */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.btn-primary, .btn-secondary, .btn-logout {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Smooth transitions for form inputs */
+input, textarea, select {
+    transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 100, 0, 0.2);
+}
+
+/* Table row animations */
+.orders-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.orders-table tbody tr:hover {
+    transform: translateX(5px);
+}
+
+/* Stat card pulse effect */
+.stat-card {
+    position: relative;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+/* Icon animations */
+.benefit-icon, .stat-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+/* Smooth page transitions */
+.page-transition {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Enhanced shadow animations */
+@keyframes shadowPulse {
+    0%, 100% {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        box-shadow: 0 8px 16px rgba(0, 100, 0, 0.3);
+    }
+}
+
+.card-hover-shadow {
+    animation: shadowPulse 2s ease-in-out infinite;
+}
+
+/* Text reveal animation */
+@keyframes textReveal {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.text-reveal {
+    animation: textReveal 0.6s ease-out;
+}
+
+/* Smooth fade in for images */
+img {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Enhanced focus states */
+*:focus-visible {
+    outline: 2px solid var(--deep-green);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Scroll indicator animation */
+@keyframes scrollIndicator {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, select, textarea {
+    will-change: transform;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

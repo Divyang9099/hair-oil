@@ -7,9 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "git add . && git commit -m \"Update website\" && git push",
+    "deploy:quick": "git add . && git commit -m \"Quick update\" && git push"
   },
   "dependencies": {
+    "framer-motion": "^12.23.24",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

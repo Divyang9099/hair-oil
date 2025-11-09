@@ -297,7 +297,7 @@ function App() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            AA Hair Oil (અંબાલા)
+            AAA Hair Oil (અંબાલા)
           </motion.a>
           <ul className="nav-links">
             {/* Nav Links Staggered Fade In with slide */}
@@ -338,7 +338,7 @@ function App() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            AAAAA હેર ઓઇલ: ૨૦ વર્ષનો અનુભવ, અંબાલાની ઔષધીઓનો વારસો
+            ABCD હેર ઓઇલ: ૨૦ વર્ષનો અનુભવ, અંબાલાની ઔષધીઓનો વારસો
           </motion.h1>
           <motion.p 
             className="sub-headline" 

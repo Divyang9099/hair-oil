@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cd frontend/my-react-app && npm install && npm run build",
+    "install": "cd frontend/my-react-app && npm install"
   },
   "keywords": [],
   "author": "",

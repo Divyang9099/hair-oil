@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
     "build": "cd frontend/my-react-app && npm install && npm run build",
-    "install": "cd frontend/my-react-app && npm install",
+    "install": "npm install && cd frontend/my-react-app && npm install",
     "deploy": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Update website'; git push\"",
     "deploy:quick": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Quick update'; git push\""
   },
@@ -16,6 +17,7 @@
   "type": "commonjs",
   "dependencies": {
     "aos": "^2.3.4",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "i18next": "^25.7.0",

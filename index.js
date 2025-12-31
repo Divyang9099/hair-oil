@@ -1,13 +1,27 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const Order = require('./db');
 const cors = require('cors');
 require('dotenv').config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+// Order Schema
+const orderSchema = new mongoose.Schema({
+    name: String,
+    phone: String,
+    address: String,
+    bottleSize: String,
+    quantity: Number,
+    price: Number,
+    total: Number,
+    date: { type: Date, default: Date.now },
+    status: { type: Boolean, default: false } // false = pending, true = completed
+});
+
+const Order = mongoose.model('Order', orderSchema);
 
 mongoose.connect('mongodb+srv://divyang:divyanggujarati@cluster0.ykivylh.mongodb.net/', {
     useNewUrlParser: true,

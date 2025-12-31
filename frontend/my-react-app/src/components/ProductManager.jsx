@@ -8,7 +8,7 @@ const ProductManager = () => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
-    const [currentProduct, setCurrentProduct] = useState({ _id: null, name: '', size: '', price: '' });
+    const [currentProduct, setCurrentProduct] = useState({ _id: null, name: '', size: '', price: '', image: '' });
     const [isFormVisible, setIsFormVisible] = useState(false);
 
     // Fetch Products
@@ -35,7 +35,7 @@ const ProductManager = () => {
 
     // CRUD Operations
     const handleAdd = () => {
-        setCurrentProduct({ _id: null, name: '', size: '', price: '' });
+        setCurrentProduct({ _id: null, name: '', size: '', price: '', image: '' });
         setIsEditing(false);
         setIsFormVisible(true);
     };
@@ -66,7 +66,8 @@ const ProductManager = () => {
         const productData = {
             name: currentProduct.name,
             size: currentProduct.size,
-            price: currentProduct.price
+            price: currentProduct.price,
+            image: currentProduct.image
         };
 
         try {
@@ -119,6 +120,7 @@ const ProductManager = () => {
                     <table className="orders-table">
                         <thead>
                             <tr>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Size</th>
                                 <th>Price (₹)</th>
@@ -133,6 +135,11 @@ const ProductManager = () => {
                                     animate={{ opacity: 1 }}
                                     whileHover={{ backgroundColor: "var(--cream-beige)" }}
                                 >
+                                    <td>
+                                        {product.image && (
+                                            <img src={product.image} alt={product.name} style={{ width: '50px', height: '50px', objectFit: 'contain' }} />
+                                        )}
+                                    </td>
                                     <td>{product.name}</td>
                                     <td>{product.size}</td>
                                     <td>₹{product.price}</td>
@@ -209,6 +216,13 @@ const ProductManager = () => {
                                     value={currentProduct.price}
                                     onChange={(e) => setCurrentProduct({ ...currentProduct, price: parseInt(e.target.value) })}
                                     required
+                                    style={{ padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Image URL"
+                                    value={currentProduct.image}
+                                    onChange={(e) => setCurrentProduct({ ...currentProduct, image: e.target.value })}
                                     style={{ padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px' }}
                                 />
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>

@@ -14,12 +14,25 @@ const OrderSection = ({ serverStatus }) => {
         quantity: 1
     });
 
-    const BOTTLE_PRICES = {
-        '250ml': 250,
-        '500ml': 500,
-        '750ml': 750,
-        '1L': 1000
-    };
+    const [products, setProducts] = useState([]);
+
+    // Fetch Products on Mount
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch('https://hair-oil.onrender.com/api/orders'); // Using orders endpoint for compatibility or products endpoint? 
+                // Wait, use the PRODUCT endpoint for products!
+                const prodResponse = await fetch('https://hair-oil.onrender.com/api/products');
+                if (prodResponse.ok) {
+                    const data = await prodResponse.json();
+                    setProducts(data);
+                }
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     const validateMobileNumber = (phone) => {
         const cleanedPhone = phone.replace(/\D/g, '');
@@ -50,7 +63,8 @@ const OrderSection = ({ serverStatus }) => {
     };
 
     const getPricePerUnit = () => {
-        return BOTTLE_PRICES[formData.bottleSize] || 299;
+        const selectedProduct = products.find(p => p.size === formData.bottleSize);
+        return selectedProduct ? selectedProduct.price : 0;
     };
 
     const calculateTotal = () => {
@@ -92,7 +106,7 @@ const OrderSection = ({ serverStatus }) => {
                 const result = await response.json();
                 console.log('Order created successfully:', result);
                 setShowSuccessMessage(true);
-                setFormData({ name: '', phone: '', address: '', bottleSize: '250ml', quantity: 1 });
+                setFormData({ name: '', phone: '', address: '', bottleSize: products[0]?.size || '', quantity: 1 });
                 setTimeout(() => {
                     setShowSuccessMessage(false);
                 }, 5000);
@@ -117,61 +131,30 @@ const OrderSection = ({ serverStatus }) => {
                     <div className="product-selection-container">
                         <h3 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--text-dark)' }}>પૅક પસંદ કરો</h3>
                         <div className="product-grid-vertical">
-                            {/* 1L Card */}
-                            <motion.div
-                                className={`product-card-small ${formData.bottleSize === '1L' ? 'selected' : ''}`}
-                                onClick={() => setFormData(prev => ({ ...prev, bottleSize: '1L' }))}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <img src="/bottle_single.png" alt="1L Bottle" className="product-thumb" style={{ height: '70px' }} />
-                                <div className="product-info-small">
-                                    <h4>1L Family Pack</h4>
-                                    <span className="price">₹{BOTTLE_PRICES['1L']}</span>
-                                </div>
-                            </motion.div>
-
-                            {/* 750ml Card */}
-                            <motion.div
-                                className={`product-card-small ${formData.bottleSize === '750ml' ? 'selected' : ''}`}
-                                onClick={() => setFormData(prev => ({ ...prev, bottleSize: '750ml' }))}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <img src="/bottle_single.png" alt="750ml Bottle" className="product-thumb" style={{ height: '65px' }} />
-                                <div className="product-info-small">
-                                    <h4>750ml Combo (500ml + 250ml)</h4>
-                                    <span className="price">₹{BOTTLE_PRICES['750ml']}</span>
-                                </div>
-                            </motion.div>
-
-                            {/* 500ml Card */}
-                            <motion.div
-                                className={`product-card-small ${formData.bottleSize === '500ml' ? 'selected' : ''}`}
-                                onClick={() => setFormData(prev => ({ ...prev, bottleSize: '500ml' }))}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <img src="/bottle_single.png" alt="500ml Bottle" className="product-thumb" style={{ height: '60px' }} />
-                                <div className="product-info-small">
-                                    <h4>500ml Value Pack</h4>
-                                    <span className="price">₹{BOTTLE_PRICES['500ml']}</span>
-                                </div>
-                            </motion.div>
-
-                            {/* 250ml Card */}
-                            <motion.div
-                                className={`product-card-small ${formData.bottleSize === '250ml' ? 'selected' : ''}`}
-                                onClick={() => setFormData(prev => ({ ...prev, bottleSize: '250ml' }))}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <img src="/bottle_single.png" alt="250ml Bottle" className="product-thumb" style={{ height: '50px' }} />
-                                <div className="product-info-small">
-                                    <h4>250ml Starter Pack</h4>
-                                    <span className="price">₹{BOTTLE_PRICES['250ml']}</span>
-                                </div>
-                            </motion.div>
+                            {products.length === 0 ? (
+                                <p style={{ textAlign: 'center' }}>Loading products...</p>
+                            ) : (
+                                products.map((product) => (
+                                    <motion.div
+                                        key={product._id}
+                                        className={`product-card-small ${formData.bottleSize === product.size ? 'selected' : ''}`}
+                                        onClick={() => setFormData(prev => ({ ...prev, bottleSize: product.size }))}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                    >
+                                        <img
+                                            src={product.image || "/bottle_single.png"}
+                                            alt={`${product.size} Bottle`}
+                                            className="product-thumb"
+                                            style={{ height: '60px', objectFit: 'contain' }}
+                                        />
+                                        <div className="product-info-small">
+                                            <h4>{product.name}</h4>
+                                            <span className="price">₹{product.price}</span>
+                                        </div>
+                                    </motion.div>
+                                ))
+                            )}
                         </div>
                     </div>
 
@@ -193,10 +176,11 @@ const OrderSection = ({ serverStatus }) => {
                             <div className="form-group">
                                 <label htmlFor="bottleSize">બાટલીનું કદ *</label>
                                 <select id="bottleSize" name="bottleSize" required value={formData.bottleSize} onChange={handleInputChange} style={{ width: '100%', padding: '0.8rem', border: '2px solid var(--deep-green)', borderRadius: '5px' }}>
-                                    <option value="250ml">250ml - ₹299</option>
-                                    <option value="500ml">500ml - ₹549</option>
-                                    <option value="750ml">750ml - ₹799</option>
-                                    <option value="1L">1L - ₹999</option>
+                                    {products.map((product) => (
+                                        <option key={product._id} value={product.size}>
+                                            {product.size} - ₹{product.price}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="form-group">

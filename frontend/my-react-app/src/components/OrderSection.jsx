@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cardVariants } from '../utils/animations';
 import '../ProductSelection.css';

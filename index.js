@@ -148,10 +148,14 @@ app.put('/api/orders/:id', async (req, res) => {
                 console.log(`Sending email to: ${updatedOrder.email} from: ${process.env.EMAIL_USER}`);
 
                 try {
+                    // Verify connection configuration
+                    await transporter.verify();
+                    console.log('SMTP connection verified');
+
                     const info = await transporter.sendMail(mailOptions);
                     console.log('SUCCESS: Email sent:', info.response);
                 } catch (emailError) {
-                    console.error('SERVER ERROR: Could not send email details:', emailError);
+                    console.error('SERVER ERROR: Could not send email. Details:', emailError);
                 }
             } else {
                 console.error('FAILURE: Skipping email because EMAIL_USER or EMAIL_PASS is missing in Environment Variables.');

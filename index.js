@@ -126,18 +126,23 @@ app.put('/api/orders/:id', async (req, res) => {
             // Send Email
             if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
                 const transporter = nodemailer.createTransport({
-                    service: 'gmail',
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false, // true for 465, false for 587
                     auth: {
                         user: process.env.EMAIL_USER,
                         pass: process.env.EMAIL_PASS
-                    }
+                    },
+                    debug: true,
+                    logger: true
                 });
 
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
                     to: updatedOrder.email,
-                    subject: 'Order Confirmation - Gujarati Divyang',
-                    text: 'your order dilevrd in eithin 7 dsyd'
+                    subject: 'Order Completed - Gujarati Divyang',
+                    text: 'Your order has been marked as Completed and developed within 7 days. Thank you!',
+                    html: '<h3>Order Completed!</h3><p>Your order has been marked as <b>Completed</b>.</p><p>It will be delivered within 7 days.</p><p>Thank you for choosing Gujarati Divyang!</p>'
                 };
 
                 console.log(`Sending email to: ${updatedOrder.email} from: ${process.env.EMAIL_USER}`);

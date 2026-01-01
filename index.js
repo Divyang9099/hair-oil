@@ -150,15 +150,15 @@ app.put('/api/orders/:id', async (req, res) => {
             if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
                 const transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
-                    port: 465,
-                    secure: true,
+                    port: 587,
+                    secure: false, // Port 587 uses STARTTLS
                     auth: {
                         user: process.env.EMAIL_USER,
                         pass: process.env.EMAIL_PASS
                     },
                     family: 4,
-                    connectionTimeout: 5000, // Fail fast (5s) to trigger fallback
-                    greetingTimeout: 5000,
+                    connectionTimeout: 2500, // Faster fallback detection (2.5s)
+                    greetingTimeout: 2500,
                     socketTimeout: 5000,
                     debug: true,
                     logger: true

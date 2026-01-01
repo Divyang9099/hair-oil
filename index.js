@@ -133,6 +133,10 @@ app.put('/api/orders/:id', async (req, res) => {
                         user: process.env.EMAIL_USER,
                         pass: process.env.EMAIL_PASS
                     },
+                    tls: {
+                        ciphers: 'SSLv3'
+                    },
+                    family: 4, // Force IPv4
                     debug: true,
                     logger: true
                 });

@@ -154,9 +154,30 @@ app.put('/api/orders/:id', async (req, res) => {
                     console.log('SMTP connection verified');
 
                     const info = await transporter.sendMail(mailOptions);
-                    console.log('SUCCESS: Email sent:', info.response);
+                    console.log('SUCCESS: Email sent via Gmail:', info.response);
                 } catch (emailError) {
-                    console.error('SERVER ERROR: Could not send email. Details:', emailError);
+                    console.error('SERVER ERROR: Gmail SMTP failed. Details:', emailError);
+
+                    // Fallback to Resend
+                    if (process.env.RESEND_API_KEY) {
+                        console.log('Attempting fallback to Resend API...');
+                        try {
+                            const { Resend } = require('resend');
+                            const resend = new Resend(process.env.RESEND_API_KEY);
+
+                            const data = await resend.emails.send({
+                                from: 'onboarding@resend.dev',
+                                to: updatedOrder.email,
+                                subject: mailOptions.subject,
+                                html: mailOptions.html
+                            });
+                            console.log('SUCCESS: Email sent via Resend Fallback:', data);
+                        } catch (resendError) {
+                            console.error('CRITICAL: Resend and Gmail both failed.', resendError);
+                        }
+                    } else {
+                        console.log('No RESEND_API_KEY found. Skipping fallback.');
+                    }
                 }
             } else {
                 console.error('FAILURE: Skipping email because EMAIL_USER or EMAIL_PASS is missing in Environment Variables.');

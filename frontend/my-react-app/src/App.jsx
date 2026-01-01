@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import './App.css'
 // Lazy Load Admin Components for separate bundle (Faster Load Times)
 const AdminLogin = lazy(() => import('./AdminLogin'));

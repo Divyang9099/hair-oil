@@ -5,7 +5,7 @@ import AboutSection from '../components/AboutSection';
 import OrderSection from '../components/OrderSection';
 import Footer from '../components/Footer';
 import LeadPopup from '../components/LeadPopup';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const LandingPage = ({ isDarkMode, setIsDarkMode, serverStatus }) => {
     const [isLeadPopupOpen, setIsLeadPopupOpen] = useState(false);

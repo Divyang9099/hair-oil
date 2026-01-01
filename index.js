@@ -20,9 +20,19 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Lead Schema
+const leadSchema = new mongoose.Schema({
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    date: { type: Date, default: Date.now }
+});
+
+const Lead = mongoose.model('Lead', leadSchema);
+
 // Order Schema
 const orderSchema = new mongoose.Schema({
     name: String,
+    email: String, // Added Email
     phone: String,
     address: String,
     bottleSize: String,
@@ -55,10 +65,24 @@ app.get('/api/orders', (req, res) => {
     });
 });
 
+// Capture Lead Route
+app.post('/api/leads', async (req, res) => {
+    try {
+        const { email, phone } = req.body;
+        const newLead = new Lead({ email, phone });
+        await newLead.save();
+        res.status(201).json({ message: 'Lead captured successfully', lead: newLead });
+    } catch (error) {
+        console.error('Error capturing lead:', error);
+        res.status(500).json({ error: 'Error capturing lead' });
+    }
+});
+
 app.post('/api/orders', (req, res) => {
-    const { name, phone, address, bottleSize, quantity, price, total } = req.body;
+    const { name, email, phone, address, bottleSize, quantity, price, total } = req.body;
     const order = new Order({
         name,
+        email,
         phone,
         address,
         bottleSize,

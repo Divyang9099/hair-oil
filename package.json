@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "build": "echo 'Backend deployment only - Skipping frontend build'",
-    "install": "echo 'Skipping custom install'",
+    "build": "npm run build --prefix frontend/my-react-app",
+    "install": "npm install && npm install --prefix frontend/my-react-app",
     "deploy": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Update website'; git push\"",
     "deploy:quick": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Quick update'; git push\""
   },

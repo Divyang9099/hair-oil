@@ -1,9 +1,8 @@
 {
   "version": 2,
-  "public": true,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
+  "buildCommand": "npm run build --prefix frontend/my-react-app",
+  "outputDirectory": "frontend/my-react-app/dist",
+  "installCommand": "npm install && npm install --prefix frontend/my-react-app",
   "framework": "vite",
   "rewrites": [
     {

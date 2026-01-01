@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { cardVariants } from '../utils/animations';
 import '../ProductSelection.css';
 
+import API_BASE_URL from '../config';
+
 const OrderSection = ({ serverStatus }) => {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,9 +22,9 @@ const OrderSection = ({ serverStatus }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('https://hair-oil.onrender.com/api/orders'); // Using orders endpoint for compatibility or products endpoint? 
+                const response = await fetch(`${API_BASE_URL}/api/orders`); // Using orders endpoint for compatibility or products endpoint? 
                 // Wait, use the PRODUCT endpoint for products!
-                const prodResponse = await fetch('https://hair-oil.onrender.com/api/products');
+                const prodResponse = await fetch(`${API_BASE_URL}/api/products`);
                 if (prodResponse.ok) {
                     const data = await prodResponse.json();
                     setProducts(data);
@@ -94,7 +96,7 @@ const OrderSection = ({ serverStatus }) => {
         };
 
         try {
-            const response = await fetch('https://hair-oil.onrender.com/api/orders', {
+            const response = await fetch(`${API_BASE_URL}/api/orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

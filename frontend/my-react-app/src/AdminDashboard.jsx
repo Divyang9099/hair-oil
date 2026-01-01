@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import './App.css'
+import API_BASE_URL from './config'
 import ProductManager from './components/ProductManager'
 
 function AdminDashboard({ onLogout }) {
@@ -21,7 +22,7 @@ function AdminDashboard({ onLogout }) {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('https://hair-oil.onrender.com/api/orders')
+      const response = await fetch(`${API_BASE_URL}/api/orders`)
       if (response.ok) {
         const data = await response.json()
         setOrders(data.orders || [])
@@ -53,7 +54,7 @@ function AdminDashboard({ onLogout }) {
     const newStatus = !currentStatus
 
     try {
-      const url = `https://hair-oil.onrender.com/api/orders/${orderId}`
+      const url = `${API_BASE_URL}/api/orders/${orderId}`
       console.log('Request URL:', url)
 
       const response = await fetch(url, {

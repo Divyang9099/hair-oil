@@ -1,9 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import './App.css'
-import AdminLogin from './AdminLogin'
-import AdminDashboard from './AdminDashboard'
+// Lazy Load Admin Components for separate bundle (Faster Load Times)
+const AdminLogin = lazy(() => import('./AdminLogin'));
+const AdminDashboard = lazy(() => import('./AdminDashboard'));
 import LandingPage from './pages/LandingPage'
 import CursorFollower from './components/CursorFollower'
+import API_BASE_URL from './config'
+
+// simple Loading spinner for Admin
+const LoadingFallback = () => (
+  <div style={{
+    height: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: '#F5F5DC',
+    color: '#006400',
+    fontSize: '1.5rem',
+    fontWeight: 'bold'
+  }}>
+    Loading Admin Panel...
+  </div>
+);
 
 function App() {
   // --- THEME TOGGLE LOGIC ---
@@ -41,7 +59,7 @@ function App() {
 
       setServerStatus('waking')
       try {
-        await fetch('https://hair-oil.onrender.com/api/orders', { method: 'GET' })
+        await fetch(`${API_BASE_URL}/api/orders`, { method: 'GET' })
         setServerStatus('ready')
         console.log('Server is ready!')
       } catch (err) {
@@ -96,11 +114,15 @@ function App() {
 
   // --- RENDER ---
   if (isAdminPage) {
-    if (isAdminLoggedIn) {
-      return <AdminDashboard onLogout={handleAdminLogout} />
-    } else {
-      return <AdminLogin onLogin={handleAdminLogin} />
-    }
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        {isAdminLoggedIn ? (
+          <AdminDashboard onLogout={handleAdminLogout} />
+        ) : (
+          <AdminLogin onLogin={handleAdminLogin} />
+        )}
+      </Suspense>
+    );
   }
 
   return (

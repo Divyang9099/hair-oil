@@ -4,8 +4,16 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 // Order Schema
@@ -23,7 +31,7 @@ const orderSchema = new mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 
-mongoose.connect('mongodb+srv://divyang:divyanggujarati@cluster0.ykivylh.mongodb.net/', {
+mongoose.connect('mongodb+srv://divyang:divyanggujarati@cluster0.ykivylh.mongodb.net/?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
@@ -133,22 +141,55 @@ app.get('/api/products', (req, res) => {
     });
 });
 
-app.post('/api/products', (req, res) => {
-    const newProduct = new Product(req.body);
-    newProduct.save().then(product => {
+app.post('/api/products', async (req, res) => {
+    try {
+        let productData = req.body;
+
+        // Handle Cloudinary Upload
+        if (productData.image && productData.image.startsWith('data:image')) {
+            try {
+                const uploadResponse = await cloudinary.uploader.upload(productData.image, {
+                    folder: 'hair_oil_products'
+                });
+                productData.image = uploadResponse.secure_url;
+            } catch (uploadError) {
+                console.error('Cloudinary Upload Error:', uploadError);
+                return res.status(500).json({ error: 'Error uploading image to Cloudinary' });
+            }
+        }
+
+        const newProduct = new Product(productData);
+        const product = await newProduct.save();
         res.status(201).json(product);
-    }).catch(err => {
+    } catch (err) {
+        console.error('Create Product Error:', err);
         res.status(500).json({ error: 'Error creating product' });
-    });
+    }
 });
 
-app.put('/api/products/:id', (req, res) => {
-    Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        .then(updatedProduct => {
-            res.json(updatedProduct);
-        }).catch(err => {
-            res.status(500).json({ error: 'Error updating product' });
-        });
+app.put('/api/products/:id', async (req, res) => {
+    try {
+        let productData = req.body;
+
+        // Handle Cloudinary Upload if image is new (starts with data:image)
+        if (productData.image && productData.image.startsWith('data:image')) {
+            try {
+                const uploadResponse = await cloudinary.uploader.upload(productData.image, {
+                    folder: 'hair_oil_products'
+                });
+                productData.image = uploadResponse.secure_url;
+            } catch (uploadError) {
+                console.error('Cloudinary Upload Error:', uploadError);
+                return res.status(500).json({ error: 'Error uploading image to Cloudinary' });
+            }
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, productData, { new: true });
+        res.json(updatedProduct);
+    } catch (err) {
+        console.error('Update Product Error:', err);
+        res.status(500).json({ error: 'Error updating product' });
+    }
 });
 
 app.delete('/api/products/:id', (req, res) => {

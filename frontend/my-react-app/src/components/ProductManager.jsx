@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import API_BASE_URL from '../config';
 
 // Base API URL
-const API_URL = 'https://hair-oil.onrender.com/api/products';
+const API_URL = `${API_BASE_URL}/api/products`;
 
 const ProductManager = () => {
     const [products, setProducts] = useState([]);
@@ -225,6 +226,32 @@ const ProductManager = () => {
                                     onChange={(e) => setCurrentProduct({ ...currentProduct, image: e.target.value })}
                                     style={{ padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px' }}
                                 />
+                                {/* File Upload Option */}
+                                <div style={{ textAlign: 'left' }}>
+                                    <label style={{ fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Or Upload from Device:</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                if (file.size > 5000000) { // Limit to 5MB
+                                                    alert("File is too large! Please use an image under 5MB.");
+                                                    return;
+                                                }
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setCurrentProduct({ ...currentProduct, image: reader.result });
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                        style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', width: '100%' }}
+                                    />
+                                    {currentProduct.image && currentProduct.image.startsWith('data:image') && (
+                                        <p style={{ fontSize: '0.8rem', color: 'green', marginTop: '5px' }}>Image loaded successfully!</p>
+                                    )}
+                                </div>
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                     <button type="submit" className="btn-primary" style={{ flex: 1 }}>
                                         {isEditing ? 'Update' : 'Create'}

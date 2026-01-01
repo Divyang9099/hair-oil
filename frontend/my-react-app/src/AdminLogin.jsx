@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import './App.css'
 
+import API_BASE_URL from './config'
+
 function AdminLogin({ onLogin }) {
   const [credentials, setCredentials] = useState({
     id: '',
@@ -10,7 +12,7 @@ function AdminLogin({ onLogin }) {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
- 
+
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -27,7 +29,7 @@ function AdminLogin({ onLogin }) {
     setError('')
 
     try {
-      const response = await fetch('https://hair-oil.onrender.com/api/admin/login', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,24 +57,24 @@ function AdminLogin({ onLogin }) {
   }
 
   return (
-    <motion.div 
+    <motion.div
       className="admin-login-container"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.div 
+      <motion.div
         className="admin-login-box"
         initial={{ opacity: 0, scale: 0.8, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ 
+        transition={{
           type: "spring",
           stiffness: 100,
           damping: 15,
           duration: 0.6
         }}
       >
-        <motion.h2 
+        <motion.h2
           className="admin-login-title"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,14 +82,14 @@ function AdminLogin({ onLogin }) {
         >
           એડમિન લોગિન
         </motion.h2>
-        <motion.form 
-          onSubmit={handleSubmit} 
+        <motion.form
+          onSubmit={handleSubmit}
           className="admin-login-form"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <motion.div 
+          <motion.div
             className="form-group"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -106,7 +108,7 @@ function AdminLogin({ onLogin }) {
               transition={{ duration: 0.2 }}
             />
           </motion.div>
-          <motion.div 
+          <motion.div
             className="form-group"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -126,12 +128,12 @@ function AdminLogin({ onLogin }) {
             />
           </motion.div>
           {error && (
-            <motion.div 
+            <motion.div
               className="error-message"
               initial={{ opacity: 0, y: -10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.9 }}
-              transition={{ 
+              transition={{
                 type: "spring",
                 stiffness: 200,
                 damping: 15
@@ -140,14 +142,14 @@ function AdminLogin({ onLogin }) {
               {error}
             </motion.div>
           )}
-          <motion.button 
-            type="submit" 
-            className="btn-secondary" 
+          <motion.button
+            type="submit"
+            className="btn-secondary"
             disabled={isLoading}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.6 }}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
               boxShadow: "0 6px 20px rgba(139, 69, 19, 0.4)"
             }}

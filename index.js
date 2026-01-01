@@ -207,6 +207,10 @@ app.post('/api/admin/login', (req, res) => {
         });
     }
 
+    // DEBUG LOGS (Temporary)
+    console.log(`Login Attempt -> Received ID: "${id}", Expected ID: "${process.env.ADMIN_ID}"`);
+    console.log(`Login Attempt -> Received Pass Length: ${password ? password.length : 0}, Expected Pass Length: ${process.env.ADMIN_PASSWORD ? process.env.ADMIN_PASSWORD.length : 0}`);
+
     if (id === ADMIN_ID && password === ADMIN_PASSWORD) {
         res.status(200).json({
             success: true,

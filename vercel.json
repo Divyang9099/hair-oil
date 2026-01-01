@@ -1,14 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend/my-react-app && npm run build",
+  "buildCommand": "npm run build --prefix frontend/my-react-app",
   "outputDirectory": "frontend/my-react-app/dist",
   "framework": "vite",
-  "installCommand": "npm install && cd frontend/my-react-app && npm install",
+  "installCommand": "npm install && npm install --prefix frontend/my-react-app",
   "rewrites": [
-    {
-      "source": "/assets/(.*)",
-      "destination": "/frontend/my-react-app/dist/assets/$1"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

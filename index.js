@@ -23,7 +23,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Order Schema
 const orderSchema = new mongoose.Schema({
     name: String,
-    email: String,
+    email: { type: String, required: true },
     phone: String,
     address: String,
     bottleSize: String,
@@ -178,15 +178,15 @@ app.put('/api/orders/:id', async (req, res) => {
                                 htmlContent: emailHtml
                             })
                         });
-                        
+
                         const result = await response.json();
                         if (response.ok) {
                             console.log("[Email] SUCCESS: Sent via Brevo API", result.messageId);
                             return;
                         }
                         console.error("[Email] Brevo API Error:", result);
-                    } catch (e) { 
-                        console.error("[Email] Brevo Connection Error:", e.message); 
+                    } catch (e) {
+                        console.error("[Email] Brevo Connection Error:", e.message);
                     }
                 }
 
@@ -204,8 +204,8 @@ app.put('/api/orders/:id', async (req, res) => {
                             subject: emailSubject, html: emailHtml
                         });
                         console.log("[Email] SUCCESS: Sent via Gmail SMTP backup.");
-                    } catch (e) { 
-                        console.error("[Email] CRITICAL: All email methods failed.", e.message); 
+                    } catch (e) {
+                        console.error("[Email] CRITICAL: All email methods failed.", e.message);
                     }
                 } else if (!process.env.BREVO_API_KEY) {
                     console.warn("[Email] ERROR: No email provider (Brevo or Gmail) is configured in environment variables.");

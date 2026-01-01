@@ -44,19 +44,32 @@ mongoose.connect('mongodb+srv://divyang:divyanggujarati@cluster0.ykivylh.mongodb
     });
 
 
-app.get('/api/orders', (req, res) => {
-    Order.find().then((orders) => {
+app.get('/api/orders', async (req, res) => {
+    try {
+        console.log(`[${new Date().toISOString()}] GET /api/orders - Fetching all orders`);
+        const orders = await Order.find();
         res.status(200).json({ orders });
-    }).catch((err) => {
-        res.status(500).json({ error: 'Error fetching orders' });
-    });
+    } catch (err) {
+        console.error(`[${new Date().toISOString()}] CRITICAL ERROR: GET /api/orders failed.`, err);
+        res.status(500).json({
+            error: 'સર્વરથી ઓર્ડર લાવવામાં સમસ્યા આવી',
+            details: err.message,
+            stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
+    }
 });
 
 // Capture Lead Route (Save as partial Order)
 app.post('/api/leads', async (req, res) => {
     try {
+        console.log(`[${new Date().toISOString()}] POST /api/leads - Payload:`, req.body);
         const { email, phone } = req.body;
-        // Create a partial order
+
+        if (!phone) {
+            console.warn(`[${new Date().toISOString()}] WARN: Lead post missing phone number`);
+            return res.status(400).json({ error: 'ફોન નંબર જરૂરી છે' });
+        }
+
         const order = new Order({
             email,
             phone,
@@ -64,34 +77,44 @@ app.post('/api/leads', async (req, res) => {
             status: false
         });
         await order.save();
+        console.log(`[${new Date().toISOString()}] SUCCESS: Lead saved (ID: ${order._id})`);
         res.status(201).json({ message: 'Lead captured successfully', order });
     } catch (error) {
-        console.error('Error capturing lead:', error);
-        res.status(500).json({ error: 'Error capturing lead' });
+        console.error(`[${new Date().toISOString()}] CRITICAL ERROR: POST /api/leads failed.`, error);
+        res.status(500).json({ error: 'લીડ સેવ કરવામાં સમસ્યા આવી', details: error.message });
     }
 });
 
-app.post('/api/orders', (req, res) => {
-    // If creating a fresh order without lead capture
-    const { name, email, phone, address, bottleSize, quantity, price, total } = req.body;
-    const order = new Order({
-        name,
-        email,
-        phone,
-        address,
-        bottleSize,
-        quantity,
-        price,
-        total,
-        date: new Date(),
-        status: false
-    });
+app.post('/api/orders', async (req, res) => {
+    try {
+        console.log(`[${new Date().toISOString()}] POST /api/orders - Creating full order`);
+        const { name, email, phone, address, bottleSize, quantity, price, total } = req.body;
 
-    order.save().then((order) => {
-        res.status(201).json({ order });
-    }).catch((err) => {
-        res.status(500).json({ error: 'Error creating order' });
-    });
+        if (!name || !phone || !address) {
+            console.warn(`[${new Date().toISOString()}] WARN: Order missing critical info (name/phone/address)`);
+            return res.status(400).json({ error: 'બધી માહિતી ભરવી જરૂરી છે' });
+        }
+
+        const order = new Order({
+            name,
+            email,
+            phone,
+            address,
+            bottleSize,
+            quantity,
+            price,
+            total,
+            date: new Date(),
+            status: false
+        });
+
+        const savedOrder = await order.save();
+        console.log(`[${new Date().toISOString()}] SUCCESS: Order created (ID: ${savedOrder._id})`);
+        res.status(201).json({ order: savedOrder });
+    } catch (err) {
+        console.error(`[${new Date().toISOString()}] CRITICAL ERROR: POST /api/orders failed.`, err);
+        res.status(500).json({ error: 'ઓર્ડર બનાવવામાં સમસ્યા આવી', details: err.message });
+    }
 });
 
 const nodemailer = require('nodemailer');
@@ -241,12 +264,15 @@ const Product = mongoose.model('Product', productSchema);
 
 // --- PRODUCT ROUTES ---
 
-app.get('/api/products', (req, res) => {
-    Product.find().then(products => {
+app.get('/api/products', async (req, res) => {
+    try {
+        console.log(`[${new Date().toISOString()}] GET /api/products - Fetching products`);
+        const products = await Product.find();
         res.json(products);
-    }).catch(err => {
-        res.status(500).json({ error: 'Error fetching products' });
-    });
+    } catch (err) {
+        console.error(`[${new Date().toISOString()}] CRITICAL ERROR: GET /api/products failed.`, err);
+        res.status(500).json({ error: 'પ્રોડક્ટ્સ લાવવામાં સમસ્યા આવી', details: err.message });
+    }
 });
 
 app.post('/api/products', async (req, res) => {
@@ -300,13 +326,26 @@ app.put('/api/products/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/products/:id', (req, res) => {
-    Product.findByIdAndDelete(req.params.id)
-        .then(() => {
-            res.json({ message: 'Product deleted' });
-        }).catch(err => {
-            res.status(500).json({ error: 'Error deleting product' });
-        });
+app.delete('/api/products/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(`[${new Date().toISOString()}] DELETE /api/products/${id}`);
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'અમાન્ય પ્રોડક્ટ ID' });
+        }
+
+        const deleted = await Product.findByIdAndDelete(id);
+        if (!deleted) {
+            return res.status(404).json({ error: 'પ્રોડક્ટ મળી નથી' });
+        }
+
+        console.log(`[${new Date().toISOString()}] SUCCESS: Product deleted`);
+        res.json({ message: 'Product deleted' });
+    } catch (err) {
+        console.error(`[${new Date().toISOString()}] CRITICAL ERROR: DELETE /api/products/ failed.`, err);
+        res.status(500).json({ error: 'પ્રોડક્ટ કાઢી નાખવામાં સમસ્યા આવી', details: err.message });
+    }
 });
 
 const port = process.env.PORT || 3000;

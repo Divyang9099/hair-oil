@@ -144,69 +144,67 @@ app.put('/api/orders/:id', async (req, res) => {
 
         // Check if status changed to True (Completed)
         if (newStatus === true && oldStatus === false) {
-            console.log("Status changed to Completed. Attempting to send email...");
+            console.log(`[Email] Status changed to Completed for Order ${id}.`);
 
-            // Send Email
-            if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 587,
-                    secure: false, // Port 587 uses STARTTLS
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
-                    },
-                    family: 4,
-                    connectionTimeout: 2500, // Faster fallback detection (2.5s)
-                    greetingTimeout: 2500,
-                    socketTimeout: 5000,
-                    debug: true,
-                    logger: true
-                });
+            const emailSubject = 'Order Completed - Gujarati Divyang';
+            const emailHtml = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
+                    <h2 style="color: #006400; text-align: center;">Order Completed! ✅</h2>
+                    <p>Dear <b>${updatedOrder.name || 'Customer'}</b>,</p>
+                    <p>Your order for <b>${updatedOrder.bottleSize}</b> hair oil has been marked as <b>Completed</b>.</p>
+                    <p>Your medicine will be safely developed and delivered within <b>7 days</b>.</p>
+                    <p>Total amount paid/due: ₹${updatedOrder.total}</p>
+                    <p>Thank you for choosing Gujarati Divyang!</p>
+                </div>
+            `;
 
-                const mailOptions = {
-                    from: process.env.EMAIL_USER,
-                    to: updatedOrder.email,
-                    subject: 'Order Completed - Gujarati Divyang',
-                    text: 'Your order has been marked as Completed and developed within 7 days. Thank you!',
-                    html: '<h3>Order Completed!</h3><p>Your order has been marked as <b>Completed</b>.</p><p>It will be delivered within 7 days.</p><p>Thank you for choosing Gujarati Divyang!</p>'
-                };
-
-                console.log(`Sending email to: ${updatedOrder.email} from: ${process.env.EMAIL_USER}`);
-
-                try {
-                    // Verify connection configuration
-                    await transporter.verify();
-                    console.log('SMTP connection verified');
-
-                    const info = await transporter.sendMail(mailOptions);
-                    console.log('SUCCESS: Email sent via Gmail:', info.response);
-                } catch (emailError) {
-                    console.error('SERVER ERROR: Gmail SMTP failed. Details:', emailError);
-
-                    // Fallback to Resend
-                    if (process.env.RESEND_API_KEY) {
-                        console.log('Attempting fallback to Resend API...');
-                        try {
-                            const { Resend } = require('resend');
-                            const resend = new Resend(process.env.RESEND_API_KEY);
-
-                            const data = await resend.emails.send({
-                                from: 'onboarding@resend.dev',
-                                to: updatedOrder.email,
-                                subject: mailOptions.subject,
-                                html: mailOptions.html
-                            });
-                            console.log('SUCCESS: Email sent via Resend Fallback:', data);
-                        } catch (resendError) {
-                            console.error('CRITICAL: Resend and Gmail both failed.', resendError);
-                        }
-                    } else {
-                        console.log('No RESEND_API_KEY found. Skipping fallback.');
+            // Function to try Gmail Fallback
+            const tryGmailFallback = async () => {
+                if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+                    console.log("[Email] Fallback: Attempting Gmail SMTP...");
+                    const transporter = nodemailer.createTransport({
+                        host: 'smtp.gmail.com',
+                        port: 587,
+                        secure: false,
+                        auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+                        connectionTimeout: 3000,
+                        family: 4
+                    });
+                    try {
+                        await transporter.sendMail({
+                            from: process.env.EMAIL_USER,
+                            to: updatedOrder.email,
+                            subject: emailSubject,
+                            html: emailHtml
+                        });
+                        console.log("[Email] SUCCESS: Sent via Gmail.");
+                    } catch (e) {
+                        console.error("[Email] CRITICAL: Gmail fallback also failed.", e.message);
                     }
                 }
+            };
+
+            // --- PRIMARY: RESEND API (Fast & Unblocked) ---
+            if (process.env.RESEND_API_KEY) {
+                try {
+                    console.log("[Email] Primary: Sending via Resend API...");
+                    const { Resend } = require('resend');
+                    const resend = new Resend(process.env.RESEND_API_KEY);
+                    const { data, error } = await resend.emails.send({
+                        from: 'onboarding@resend.dev',
+                        to: updatedOrder.email,
+                        subject: emailSubject,
+                        html: emailHtml,
+                    });
+                    if (error) throw error;
+                    console.log(`[Email] SUCCESS: Primary email sent via Resend. ID: ${data.id}`);
+                } catch (err) {
+                    console.error("[Email] Primary (Resend) failed:", err.message);
+                    await tryGmailFallback();
+                }
             } else {
-                console.error('FAILURE: Skipping email because EMAIL_USER or EMAIL_PASS is missing in Environment Variables.');
+                console.log("[Email] RESEND_API_KEY not found. Trying Gmail as primary.");
+                await tryGmailFallback();
             }
         }
 

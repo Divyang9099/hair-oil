@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "build": "cd frontend/my-react-app && npm install && npm run build",
-    "install": "cd frontend/my-react-app && npm install",
+    "build": "echo 'Backend deployment only - Skipping frontend build'",
+    "install": "echo 'Skipping custom install'",
     "deploy": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Update website'; git push\"",
     "deploy:quick": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Quick update'; git push\""
   },
@@ -24,6 +24,7 @@
     "i18next": "^25.7.0",
     "mongoose": "^8.19.3",
     "nodemailer": "^7.0.12",
-    "react-i18next": "^16.3.5"
+    "react-i18next": "^16.3.5",
+    "resend": "^6.6.0"
   }
 }

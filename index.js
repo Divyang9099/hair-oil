@@ -20,19 +20,10 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Lead Schema
-const leadSchema = new mongoose.Schema({
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
-    date: { type: Date, default: Date.now }
-});
-
-const Lead = mongoose.model('Lead', leadSchema);
-
 // Order Schema
 const orderSchema = new mongoose.Schema({
     name: String,
-    email: String, // Added Email
+    email: String,
     phone: String,
     address: String,
     bottleSize: String,
@@ -56,22 +47,26 @@ mongoose.connect('mongodb+srv://divyang:divyanggujarati@cluster0.ykivylh.mongodb
 
 
 app.get('/api/orders', (req, res) => {
-
     Order.find().then((orders) => {
-
         res.status(200).json({ orders });
     }).catch((err) => {
         res.status(500).json({ error: 'Error fetching orders' });
     });
 });
 
-// Capture Lead Route
+// Capture Lead Route (Save as partial Order)
 app.post('/api/leads', async (req, res) => {
     try {
         const { email, phone } = req.body;
-        const newLead = new Lead({ email, phone });
-        await newLead.save();
-        res.status(201).json({ message: 'Lead captured successfully', lead: newLead });
+        // Create a partial order
+        const order = new Order({
+            email,
+            phone,
+            date: new Date(),
+            status: false
+        });
+        await order.save();
+        res.status(201).json({ message: 'Lead captured successfully', order });
     } catch (error) {
         console.error('Error capturing lead:', error);
         res.status(500).json({ error: 'Error capturing lead' });
@@ -79,6 +74,7 @@ app.post('/api/leads', async (req, res) => {
 });
 
 app.post('/api/orders', (req, res) => {
+    // If creating a fresh order without lead capture
     const { name, email, phone, address, bottleSize, quantity, price, total } = req.body;
     const order = new Order({
         name,
@@ -102,13 +98,13 @@ app.post('/api/orders', (req, res) => {
 
 app.put('/api/orders/:id', (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: 'Invalid order ID' });
     }
 
-    Order.findByIdAndUpdate(id, { status }, { new: true })
+    // Allow updating any field passed in body (status, or full order details)
+    Order.findByIdAndUpdate(id, req.body, { new: true })
         .then((order) => {
             if (!order) {
                 return res.status(404).json({ error: 'Order not found' });

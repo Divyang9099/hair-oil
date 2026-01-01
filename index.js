@@ -36,14 +36,12 @@ const orderSchema = new mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 
-mongoose.connect('mongodb+srv://divyang:divyanggujarati@cluster0.ykivylh.mongodb.net/?retryWrites=true&w=majority', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log('Connected to MongoDB');
-}).catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-});
+mongoose.connect('mongodb+srv://divyang:divyanggujarati@cluster0.ykivylh.mongodb.net/?retryWrites=true&w=majority')
+    .then(() => {
+        console.log('Connected to MongoDB');
+    }).catch((err) => {
+        console.error('Error connecting to MongoDB:', err);
+    });
 
 
 app.get('/api/orders', (req, res) => {
@@ -96,25 +94,70 @@ app.post('/api/orders', (req, res) => {
     });
 });
 
-app.put('/api/orders/:id', (req, res) => {
+const nodemailer = require('nodemailer');
+
+app.put('/api/orders/:id', async (req, res) => {
     const { id } = req.params;
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: 'Invalid order ID' });
     }
 
-    // Allow updating any field passed in body (status, or full order details)
-    Order.findByIdAndUpdate(id, req.body, { new: true })
-        .then((order) => {
-            if (!order) {
-                return res.status(404).json({ error: 'Order not found' });
+    try {
+        // Find existing order to check previous status
+        const existingOrder = await Order.findById(id);
+        if (!existingOrder) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Update order
+        const updatedOrder = await Order.findByIdAndUpdate(id, req.body, { new: true });
+
+        // DEBUG LOGGING
+        const newStatus = req.body.status === true || req.body.status === 'true';
+        const oldStatus = existingOrder.status === true || existingOrder.status === 'true';
+
+        console.log(`Checking Email Trigger: OldStatus=${oldStatus}, NewStatus=${newStatus}, EmailConfigured=${!!(process.env.EMAIL_USER && process.env.EMAIL_PASS)}`);
+
+        // Check if status changed to True (Completed)
+        if (newStatus === true && oldStatus === false) {
+            console.log("Status changed to Completed. Attempting to send email...");
+
+            // Send Email
+            if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS
+                    }
+                });
+
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: updatedOrder.email,
+                    subject: 'Order Confirmation - Gujarati Divyang',
+                    text: 'your order dilevrd in eithin 7 dsyd'
+                };
+
+                console.log(`Sending email to: ${updatedOrder.email} from: ${process.env.EMAIL_USER}`);
+
+                try {
+                    const info = await transporter.sendMail(mailOptions);
+                    console.log('SUCCESS: Email sent:', info.response);
+                } catch (emailError) {
+                    console.error('SERVER ERROR: Could not send email details:', emailError);
+                }
+            } else {
+                console.error('FAILURE: Skipping email because EMAIL_USER or EMAIL_PASS is missing in Environment Variables.');
             }
-            res.status(200).json({ order });
-        })
-        .catch((err) => {
-            console.error('Error updating order:', err);
-            res.status(500).json({ error: 'Error updating order', details: err.message });
-        });
+        }
+
+        res.status(200).json({ order: updatedOrder });
+    } catch (err) {
+        console.error('Error updating order:', err);
+        res.status(500).json({ error: 'Error updating order', details: err.message });
+    }
 });
 
 app.post('/api/admin/login', (req, res) => {
@@ -225,6 +268,7 @@ app.delete('/api/products/:id', (req, res) => {
         });
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+const port = process.env.PORT || 3000;
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running on port ${port}`);
 });

@@ -11,6 +11,7 @@ const ProductManager = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentProduct, setCurrentProduct] = useState({ _id: null, name: '', size: '', price: '', image: '' });
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Fetch Products
     useEffect(() => {
@@ -64,6 +65,7 @@ const ProductManager = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         const productData = {
             name: currentProduct.name,
             size: currentProduct.size,
@@ -95,6 +97,8 @@ const ProductManager = () => {
             }
         } catch (error) {
             console.error('Error saving product:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -253,8 +257,13 @@ const ProductManager = () => {
                                     )}
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                    <button type="submit" className="btn-primary" style={{ flex: 1 }}>
-                                        {isEditing ? 'Update' : 'Create'}
+                                    <button
+                                        type="submit"
+                                        className="btn-primary"
+                                        style={{ flex: 1, opacity: isSubmitting ? 0.7 : 1 }}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
                                     </button>
                                     <button
                                         type="button"

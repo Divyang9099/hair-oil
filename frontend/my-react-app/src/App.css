@@ -802,12 +802,39 @@ body.light-mode footer::before {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   border: 2px solid var(--deep-green);
+  /* Scrollbar Styling for Webkit Browsers */
+  scrollbar-width: thin;
+  scrollbar-color: var(--deep-green) #f1f1f1;
+}
+
+.orders-table-container::-webkit-scrollbar {
+  height: 12px;
+  /* Height of horizontal scrollbar */
+  width: 12px;
+  /* Width of vertical scrollbar */
+}
+
+.orders-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.orders-table-container::-webkit-scrollbar-thumb {
+  background: var(--deep-green);
+  border-radius: 10px;
+  border: 3px solid #f1f1f1;
+  /* Creates padding around thumb */
+}
+
+.orders-table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--light-green);
 }
 
 .orders-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
+  min-width: 1500px;
+  /* Force wide table to ensure scrollbar is needed */
 }
 
 .orders-table th {

@@ -23,6 +23,7 @@
     "express": "^5.1.0",
     "i18next": "^25.7.0",
     "mongoose": "^8.19.3",
+    "nodemailer": "^7.0.12",
     "react-i18next": "^16.3.5"
   }
 }

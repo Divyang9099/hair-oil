@@ -5,11 +5,12 @@ import '../ProductSelection.css';
 
 import API_BASE_URL from '../config';
 
-const OrderSection = ({ serverStatus }) => {
+const OrderSection = ({ serverStatus, partialOrder }) => {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
+        email: '',
         phone: '',
         address: '',
         bottleSize: '250ml',
@@ -17,6 +18,19 @@ const OrderSection = ({ serverStatus }) => {
     });
 
     const [products, setProducts] = useState([]);
+    const [orderId, setOrderId] = useState(null);
+
+    // Update form when partialOrder changes
+    useEffect(() => {
+        if (partialOrder) {
+            setFormData(prev => ({
+                ...prev,
+                email: partialOrder.email || prev.email,
+                phone: partialOrder.phone || prev.phone
+            }));
+            setOrderId(partialOrder._id);
+        }
+    }, [partialOrder]);
 
     // Fetch Products on Mount
     useEffect(() => {
@@ -87,6 +101,7 @@ const OrderSection = ({ serverStatus }) => {
 
         const orderData = {
             name: formData.name,
+            email: formData.email,
             phone: formData.phone,
             address: formData.address,
             bottleSize: formData.bottleSize,
@@ -96,8 +111,16 @@ const OrderSection = ({ serverStatus }) => {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/orders`, {
-                method: 'POST',
+            let url = `${API_BASE_URL}/api/orders`;
+            let method = 'POST';
+
+            if (orderId) {
+                url = `${API_BASE_URL}/api/orders/${orderId}`;
+                method = 'PUT';
+            }
+
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -108,7 +131,7 @@ const OrderSection = ({ serverStatus }) => {
                 const result = await response.json();
                 console.log('Order created successfully:', result);
                 setShowSuccessMessage(true);
-                setFormData({ name: '', phone: '', address: '', bottleSize: products[0]?.size || '', quantity: 1 });
+                setFormData({ name: '', email: '', phone: '', address: '', bottleSize: products[0]?.size || '', quantity: 1 });
                 setTimeout(() => {
                     setShowSuccessMessage(false);
                 }, 5000);
@@ -166,6 +189,10 @@ const OrderSection = ({ serverStatus }) => {
                             <div className="form-group">
                                 <label htmlFor="name">નામ *</label>
                                 <input type="text" id="name" name="name" required placeholder="તમારું પૂર્ણ નામ લખો" value={formData.name} onChange={handleInputChange} />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="email">ઇમેઇલ *</label>
+                                <input type="email" id="email" name="email" required placeholder="તમારો ઇમેઇલ લખો" value={formData.email} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="phone">ફોન નંબર *</label>

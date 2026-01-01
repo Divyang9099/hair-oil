@@ -57,12 +57,15 @@ function AdminDashboard({ onLogout }) {
       const url = `${API_BASE_URL}/api/orders/${orderId}`
       console.log('Request URL:', url)
 
+      const orderToUpdate = orders.find(o => o._id === orderId)
+      const updatedOrderData = { ...orderToUpdate, status: newStatus }
+
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify(updatedOrderData)
       })
 
       console.log('Response status:', response.status)
@@ -70,6 +73,8 @@ function AdminDashboard({ onLogout }) {
       if (response.ok) {
         const data = await response.json()
         console.log('Status updated successfully:', data)
+        const message = newStatus ? '✅ Status Updated & Confirmation Email Sent!' : '✅ Status Updated'
+        alert(message)
         fetchOrders()
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
@@ -107,11 +112,13 @@ function AdminDashboard({ onLogout }) {
     : statusFilteredOrders.filter(order => {
       const query = searchQuery.toLowerCase().trim()
       const name = (order.name || '').toLowerCase()
+      const email = (order.email || '').toLowerCase()
       const phone = (order.phone || '').toString()
       const address = (order.address || '').toLowerCase()
       const bottleSize = (order.bottleSize || '').toLowerCase()
 
       return name.includes(query) ||
+        email.includes(query) ||
         phone.includes(query) ||
         address.includes(query) ||
         bottleSize.includes(query)
@@ -147,6 +154,44 @@ function AdminDashboard({ onLogout }) {
     }
   }
 
+  // Sync Scroll Logic
+  const tableContainerRef = useState(null) // Using callback ref or effect? simpler to use standard ref
+  const [tableContainer, setTableContainer] = useState(null)
+  const [dummyScroll, setDummyScroll] = useState(null)
+
+  useEffect(() => {
+    if (tableContainer && dummyScroll) {
+      const handleTableScroll = () => {
+        dummyScroll.scrollLeft = tableContainer.scrollLeft
+      }
+
+      const handleDummyScroll = () => {
+        tableContainer.scrollLeft = dummyScroll.scrollLeft
+      }
+
+      tableContainer.addEventListener('scroll', handleTableScroll)
+      dummyScroll.addEventListener('scroll', handleDummyScroll)
+
+      return () => {
+        tableContainer.removeEventListener('scroll', handleTableScroll)
+        dummyScroll.removeEventListener('scroll', handleDummyScroll)
+      }
+    }
+  }, [tableContainer, dummyScroll])
+
+  // Update dummy width on resize or data load
+  const [tableWidth, setTableWidth] = useState(1500)
+  useEffect(() => {
+    if (tableContainer) {
+      const resizeObserver = new ResizeObserver(() => {
+        setTableWidth(tableContainer.scrollWidth)
+      })
+      resizeObserver.observe(tableContainer)
+      return () => resizeObserver.disconnect()
+    }
+  }, [tableContainer, orders])
+
+
   return (
     <motion.div
       className="admin-dashboard"
@@ -154,6 +199,7 @@ function AdminDashboard({ onLogout }) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      {/* ... Headers ... */}
       <motion.header
         className="admin-header"
         initial={{ y: -100, opacity: 0 }}
@@ -399,13 +445,14 @@ function AdminDashboard({ onLogout }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            <div className="container">
+            <div className="container" style={{ position: 'relative' }}>
               <motion.div
                 className="admin-controls"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.7 }}
               >
+                {/* ... Controls code same ... */}
                 <motion.h2
                   className="section-title"
                   initial={{ opacity: 0, x: -20 }}
@@ -462,7 +509,7 @@ function AdminDashboard({ onLogout }) {
               >
                 <motion.input
                   type="text"
-                  placeholder="🔍 શોધો... (નામ, ફોન, સરનામું, બાટલી કદ)"
+                  placeholder="🔍 શોધો... (નામ, ઇમેઇલ, ફોન, સરનામું...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{
@@ -485,111 +532,109 @@ function AdminDashboard({ onLogout }) {
               </motion.div>
 
               {isLoading ? (
-                <motion.div
-                  className="loading-message"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <motion.span
-                    animate={{ opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  >
-                    લોડ થઈ રહ્યું છે...
-                  </motion.span>
-                </motion.div>
+                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
               ) : error ? (
-                <motion.div
-                  className="error-message"
-                  initial={{ opacity: 0, y: -20, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 15
-                  }}
-                >
-                  {error}
-                </motion.div>
+                <div style={{ textAlign: 'center', color: 'red' }}>{error}</div>
               ) : filteredOrders.length === 0 ? (
-                <motion.div
-                  className="no-orders"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  કોઈ ઓર્ડર મળ્યા નથી
-                </motion.div>
+                <div style={{ textAlign: 'center' }}>No orders found</div>
               ) : (
-                <motion.div
-                  className="orders-table-container"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 1 }}
-                >
-                  <table className="orders-table">
-                    <thead>
-                      <tr>
-                        <th>ક્રમ</th>
-                        <th>નામ</th>
-                        <th>ફોન</th>
-                        <th>સરનામું</th>
-                        <th>બાટલી કદ</th>
-                        <th>પ્રમાણ</th>
-                        <th>એકમ ભાવ</th>
-                        <th>કુલ રકમ</th>
-                        <th>તારીખ</th>
-                        <th>સ્થિતિ</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredOrders.map((order, index) => (
-                        <motion.tr
-                          key={order._id || index}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{
-                            duration: 0.3,
-                            delay: index * 0.05
-                          }}
-                          whileHover={{
-                            backgroundColor: "var(--cream-beige)",
-                            scale: 1.01,
-                            transition: { duration: 0.2 }
-                          }}
-                        >
-                          <td>{index + 1}</td>
-                          <td>{order.name || 'N/A'}</td>
-                          <td>{order.phone || 'N/A'}</td>
-                          <td className="address-cell">{order.address || 'N/A'}</td>
-                          <td>{order.bottleSize || 'N/A'}</td>
-                          <td>{order.quantity || 0}</td>
-                          <td>₹{order.price || 0}</td>
-                          <td className="total-cell">₹{order.total || 0}</td>
-                          <td>{formatDate(order.date)}</td>
-                          <td>
-                            <motion.label
-                              className="toggle-switch"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={order.status || false}
-                                onChange={() => handleStatusChange(order._id, order.status)}
-                              />
-                              <motion.span
-                                className="toggle-slider"
-                                animate={order.status ? { backgroundColor: "var(--deep-green)" } : { backgroundColor: "#ffa500" }}
-                                transition={{ duration: 0.3 }}
-                              />
-                            </motion.label>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </motion.div>
+                <>
+                  <motion.div
+                    className="orders-table-container"
+                    ref={setTableContainer}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 1 }}
+                  >
+                    <table className="orders-table">
+                      <thead>
+                        <tr>
+                          <th>ક્રમ</th>
+                          <th>નામ</th>
+                          <th>ઇમેઇલ</th>
+                          <th>ફોન</th>
+                          <th>સરનામું</th>
+                          <th>બાટલી કદ</th>
+                          <th>પ્રમાણ</th>
+                          <th>એકમ ભાવ</th>
+                          <th>કુલ રકમ</th>
+                          <th>તારીખ</th>
+                          <th>સ્થિતિ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredOrders.map((order, index) => (
+                          <motion.tr
+                            key={order._id || index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{
+                              duration: 0.3,
+                              delay: index * 0.05
+                            }}
+                            whileHover={{
+                              backgroundColor: "var(--cream-beige)",
+                              scale: 1.01,
+                              transition: { duration: 0.2 }
+                            }}
+                          >
+                            <td>{index + 1}</td>
+                            <td>{order.name || 'N/A'}</td>
+                            <td>{order.email || 'N/A'}</td>
+                            <td>{order.phone || 'N/A'}</td>
+                            <td className="address-cell">{order.address || 'N/A'}</td>
+                            <td>{order.bottleSize || 'N/A'}</td>
+                            <td>{order.quantity || 0}</td>
+                            <td>₹{order.price || 0}</td>
+                            <td className="total-cell">₹{order.total || 0}</td>
+                            <td>{formatDate(order.date)}</td>
+                            <td>
+                              <motion.label
+                                className="toggle-switch"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={order.status || false}
+                                  onChange={() => handleStatusChange(order._id, order.status)}
+                                />
+                                <motion.span
+                                  className="toggle-slider"
+                                  animate={order.status ? { backgroundColor: "var(--deep-green)" } : { backgroundColor: "#ffa500" }}
+                                  transition={{ duration: 0.3 }}
+                                />
+                              </motion.label>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </motion.div>
+
+                  {/* Fixed Horizontal Scroll Bar */}
+                  <div
+                    ref={setDummyScroll}
+                    className="fixed-bottom-scroll"
+                    style={{
+                      position: 'fixed',
+                      bottom: '10px', /* Raised up slightly */
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '95%', /* Slight gap on sides */
+                      height: '24px',
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      zIndex: 9999,
+                      backgroundColor: '#f0fff4',
+                      border: '2px solid var(--deep-green)', /* Full border */
+                      borderRadius: '12px', /* Rounded ends */
+                      boxShadow: '0 4px 15px rgba(0,0,0,0.3)' /* heavier shadow for floating effect */
+                    }}
+                  >
+                    <div style={{ width: tableWidth + 'px', height: '1px' }}></div>
+                  </div>
+                </>
               )}
             </div>
           </motion.div>
@@ -597,6 +642,7 @@ function AdminDashboard({ onLogout }) {
       )}
     </motion.div>
   )
+
 }
 
 export default AdminDashboard

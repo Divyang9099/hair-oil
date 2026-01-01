@@ -128,12 +128,15 @@ app.put('/api/orders/:id', async (req, res) => {
                 const transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
                     port: 465,
-                    secure: true, // true for 465, false for 587
+                    secure: true,
                     auth: {
                         user: process.env.EMAIL_USER,
                         pass: process.env.EMAIL_PASS
                     },
-                    family: 4, // Force IPv4
+                    family: 4,
+                    connectionTimeout: 5000, // Fail fast (5s) to trigger fallback
+                    greetingTimeout: 5000,
+                    socketTimeout: 5000,
                     debug: true,
                     logger: true
                 });

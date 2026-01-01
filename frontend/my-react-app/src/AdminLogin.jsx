@@ -29,6 +29,7 @@ function AdminLogin({ onLogin }) {
     setError('')
 
     try {
+      console.log(`[AdminLogin] Attempting login to: ${API_BASE_URL}/api/admin/login`);
       const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
         method: 'POST',
         headers: {
@@ -38,21 +39,27 @@ function AdminLogin({ onLogin }) {
           id: credentials.id,
           password: credentials.password
         })
-      })
+      });
 
-      const data = await response.json()
+      console.log(`[AdminLogin] Response status: ${response.status}`);
+      const data = await response.json().catch(err => {
+        console.error('[AdminLogin] Failed to parse JSON response:', err);
+        return { success: false, error: 'સર્વરથી અયોગ્ય રિસ્પોન્સ મળ્યો' };
+      });
 
       if (response.ok && data.success) {
-        localStorage.setItem('adminLoggedIn', 'true')
-        onLogin(true)
+        console.log('[AdminLogin] Login successful!');
+        localStorage.setItem('adminLoggedIn', 'true');
+        onLogin(true);
       } else {
-        setError(data.error || 'અમાન્ય ID અથવા પાસવર્ડ')
-        setIsLoading(false)
+        console.warn('[AdminLogin] Login failed:', data.error || 'Unknown Error');
+        setError(data.error || 'અમાન્ય ID અથવા પાસવર્ડ');
+        setIsLoading(false);
       }
     } catch (error) {
-      console.error('Login error:', error)
-      setError('સર્વર સાથે કનેક્શન નથી')
-      setIsLoading(false)
+      console.error('[AdminLogin] CRITICAL FETCH ERROR:', error);
+      setError(`સર્વર સાથે કનેક્શન નથી: ${error.message}`);
+      setIsLoading(false);
     }
   }
 

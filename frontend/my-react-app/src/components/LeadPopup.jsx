@@ -34,6 +34,7 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
         setIsSubmitting(true);
 
         try {
+            console.log(`[LeadPopup] Posting lead to: ${API_BASE_URL}/api/leads`, { email, phone });
             const response = await fetch(`${API_BASE_URL}/api/leads`, {
                 method: 'POST',
                 headers: {
@@ -44,14 +45,17 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
 
             if (response.ok) {
                 const data = await response.json();
+                console.log('[LeadPopup] Lead captured successfully:', data);
                 onSuccess(data.order); // Pass the created order (with _id)
                 onClose();
             } else {
-                setError('માહિતી સેવ કરવામાં ભૂલ આવી. ફરી પ્રયાસ કરો.');
+                const errorData = await response.json().catch(() => ({ error: 'Unknown Error' }));
+                console.error(`[LeadPopup] Failed to capture lead. Status: ${response.status}`, errorData);
+                setError(errorData.error || 'માહિતી સેવ કરવામાં ભૂલ આવી. ફરી પ્રયાસ કરો.');
             }
         } catch (err) {
-            console.error(err);
-            setError('સર્વર સાથે કનેક્શન નથી.');
+            console.error('[LeadPopup] CRITICAL ERROR: handleSubmit failed.', err);
+            setError(`સર્વર સાથે કનેક્શન નથી: ${err.message}`);
         } finally {
             setIsSubmitting(false);
         }

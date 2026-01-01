@@ -119,6 +119,8 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
                 method = 'PUT';
             }
 
+            console.log(`[OrderSection] Submitting Order via ${method} to ${url}`, orderData);
+
             const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -129,19 +131,20 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log('Order created successfully:', result);
+                console.log('[OrderSection] Order saved successfully:', result);
                 setShowSuccessMessage(true);
                 setFormData({ name: '', email: '', phone: '', address: '', bottleSize: products[0]?.size || '', quantity: 1 });
                 setTimeout(() => {
                     setShowSuccessMessage(false);
                 }, 5000);
             } else {
-                const error = await response.json();
-                alert(`ભૂલ: ${error.error || 'ઓર્ડર બનાવવામાં સમસ્યા આવી'}`);
+                const errorData = await response.json().catch(() => ({ error: 'Unknown server error' }));
+                console.error(`[OrderSection] Order failed. Status: ${response.status}`, errorData);
+                alert(`ઓર્ડર આપવામાં ભૂલ: ${errorData.error || 'સર્વરમાં સમસ્યા આવી'}`);
             }
         } catch (error) {
-            console.error('Error submitting order:', error);
-            alert('ભૂલ: સર્વર સાથે કનેક્શન નથી. કૃપા કરીને પછી પ્રયાસ કરો.');
+            console.error('[OrderSection] CRITICAL ERROR: handleFormSubmit failed.', error);
+            alert(`સર્વર સાથે કનેક્શન નથી: ${error.message}`);
         } finally {
             setIsSubmitting(false);
         }

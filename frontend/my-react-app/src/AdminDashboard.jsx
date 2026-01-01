@@ -24,17 +24,22 @@ function AdminDashboard({ onLogout }) {
 
   const fetchOrders = async () => {
     try {
+      console.log(`[AdminDashboard] Fetching orders from ${API_BASE_URL}/api/orders...`);
       const response = await fetch(`${API_BASE_URL}/api/orders`)
+
       if (response.ok) {
         const data = await response.json()
+        console.log(`[AdminDashboard] Successfully fetched ${data.orders ? data.orders.length : 0} orders.`);
         setOrders(data.orders || [])
         setError('')
       } else {
-        setError('ઓર્ડર લાવવામાં સમસ્યા આવી')
+        const errorText = await response.text();
+        console.error(`[AdminDashboard] Failed to fetch orders. Status: ${response.status}. Body: ${errorText}`);
+        setError(`ઓર્ડર લાવવામાં સમસ્યા આવી (Status: ${response.status})`)
       }
     } catch (error) {
-      console.error('Error fetching orders:', error)
-      setError('સર્વર સાથે કનેક્શન નથી')
+      console.error('[AdminDashboard] CRITICAL ERROR: fetchOrders failed.', error)
+      setError(`સર્વર સાથે કનેક્શન નથી: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
@@ -46,20 +51,30 @@ function AdminDashboard({ onLogout }) {
   }
 
   const handleDeleteClick = async (orderId) => {
+    if (!orderId) {
+      console.error('[AdminDashboard] handleDeleteClick called without orderId');
+      return;
+    }
+
     if (window.confirm('Are you sure you want to delete this order?')) {
       try {
+        console.log(`[AdminDashboard] Attempting to delete order: ${orderId}`);
         const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
           method: 'DELETE'
         });
+
         if (response.ok) {
-          alert('Order deleted successfully');
+          console.log('[AdminDashboard] Order deleted successfully');
+          alert('ઓર્ડર સફળતાપૂર્વક કાઢી નાખવામાં આવ્યો');
           fetchOrders();
         } else {
-          alert('Failed to delete order');
+          const errorData = await response.json().catch(() => ({ error: 'Unknown Error' }));
+          console.error(`[AdminDashboard] Delete failed. Status: ${response.status}`, errorData);
+          alert(`ઓર્ડર કાઢી નાખવામાં નિષ્ફળતા: ${errorData.error}`);
         }
       } catch (error) {
-        console.error('Error deleting order:', error);
-        alert('Error deleting order');
+        console.error('[AdminDashboard] CRITICAL ERROR: handleDeleteClick failed.', error);
+        alert(`ભૂલ આવી: ${error.message}`);
       }
     }
   }
@@ -70,26 +85,35 @@ function AdminDashboard({ onLogout }) {
   }
 
   const handleSaveEdit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    if (!editingOrder || !editingOrder._id) {
+      console.error('[AdminDashboard] handleSaveEdit called without valid editingOrder');
+      return;
+    }
+
     try {
+      console.log(`[AdminDashboard] Saving edits for order: ${editingOrder._id}`, editingOrder);
       const response = await fetch(`${API_BASE_URL}/api/orders/${editingOrder._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(editingOrder),
-      })
+      });
 
       if (response.ok) {
-        alert('Order updated successfully')
-        setIsEditModalOpen(false)
-        fetchOrders()
+        console.log('[AdminDashboard] Order updated successfully');
+        alert('ઓર્ડરની માહિતી સફળતાપૂર્વક સુધારાઈ ગઈ');
+        setIsEditModalOpen(false);
+        fetchOrders();
       } else {
-        alert('Failed to update order')
+        const errorData = await response.json().catch(() => ({ error: 'Unknown Error' }));
+        console.error(`[AdminDashboard] Update failed. Status: ${response.status}`, errorData);
+        alert(`ઓર્ડર સુધારવામાં નિષ્ફળતા: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error updating order:', error)
-      alert('Error updating order')
+      console.error('[AdminDashboard] CRITICAL ERROR: handleSaveEdit failed.', error);
+      alert(`ભૂલ આવી: ${error.message}`);
     }
   }
 

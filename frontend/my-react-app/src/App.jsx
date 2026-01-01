@@ -6,6 +6,7 @@ const AdminDashboard = lazy(() => import('./AdminDashboard'));
 import LandingPage from './pages/LandingPage'
 import CursorFollower from './components/CursorFollower'
 import API_BASE_URL from './config'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // simple Loading spinner for Admin
 const LoadingFallback = () => (
@@ -59,12 +60,12 @@ function App() {
 
       setServerStatus('waking')
       try {
+        console.log('[App] Pinging server to wake up...');
         await fetch(`${API_BASE_URL}/api/orders`, { method: 'GET' })
         setServerStatus('ready')
-        console.log('Server is ready!')
+        console.log('[App] Server is ready!')
       } catch (err) {
-        console.log('Server ping sent')
-        // Even if it fails (e.g. 404), the server is likely awake
+        console.warn('[App] Server ping failed or still waking up', err)
         setServerStatus('ready')
       }
     }
@@ -113,27 +114,27 @@ function App() {
   }
 
   // --- RENDER ---
-  if (isAdminPage) {
-    return (
-      <Suspense fallback={<LoadingFallback />}>
-        {isAdminLoggedIn ? (
-          <AdminDashboard onLogout={handleAdminLogout} />
-        ) : (
-          <AdminLogin onLogin={handleAdminLogin} />
-        )}
-      </Suspense>
-    );
-  }
-
   return (
-    <>
-      <CursorFollower />
-      <LandingPage
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
-        serverStatus={serverStatus}
-      />
-    </>
+    <ErrorBoundary>
+      {isAdminPage ? (
+        <Suspense fallback={<LoadingFallback />}>
+          {isAdminLoggedIn ? (
+            <AdminDashboard onLogout={handleAdminLogout} />
+          ) : (
+            <AdminLogin onLogin={handleAdminLogin} />
+          )}
+        </Suspense>
+      ) : (
+        <>
+          <CursorFollower />
+          <LandingPage
+            isDarkMode={isDarkMode}
+            setIsDarkMode={setIsDarkMode}
+            serverStatus={serverStatus}
+          />
+        </>
+      )}
+    </ErrorBoundary>
   )
 }
 

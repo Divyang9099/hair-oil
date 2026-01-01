@@ -21,15 +21,20 @@ const ProductManager = () => {
     const fetchProducts = async () => {
         setIsLoading(true);
         try {
+            console.log(`[ProductManager] Fetching products from ${API_URL}`);
             const response = await fetch(API_URL);
             if (response.ok) {
                 const data = await response.json();
+                console.log(`[ProductManager] Successfully fetched ${data.length} products.`);
                 setProducts(data);
             } else {
-                console.error('Failed to fetch products');
+                const errorText = await response.text();
+                console.error(`[ProductManager] Failed to fetch products. Status: ${response.status}. Body: ${errorText}`);
+                alert('પ્રોડક્ટ્સ લાવવામાં સમસ્યા આવી');
             }
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('[ProductManager] CRITICAL ERROR: fetchProducts failed.', error);
+            alert(`સર્વર સાથે કનેક્શન નથી: ${error.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -49,16 +54,22 @@ const ProductManager = () => {
     };
 
     const handleDelete = async (id) => {
+        if (!id) return;
         if (window.confirm('શું તમે ખરેખર આ પ્રોડક્ટ ડિલીટ કરવા માંગો છો?')) {
             try {
+                console.log(`[ProductManager] Deleting product: ${id}`);
                 const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                 if (response.ok) {
+                    console.log('[ProductManager] Product deleted successfully');
                     setProducts(products.filter(p => p._id !== id));
                 } else {
-                    alert('Error deleting product');
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    console.error(`[ProductManager] Delete failed. Status: ${response.status}`, errorData);
+                    alert(`પ્રોડક્ટ ડિલીટ કરવામાં નિષ્ફળતા: ${errorData.error}`);
                 }
             } catch (error) {
-                console.error('Error deleting product:', error);
+                console.error('[ProductManager] CRITICAL ERROR: handleDelete failed.', error);
+                alert(`ભૂલ આવી: ${error.message}`);
             }
         }
     };
@@ -75,6 +86,7 @@ const ProductManager = () => {
 
         try {
             let response;
+            console.log(`[ProductManager] Submitting product (Editing: ${isEditing})`, productData);
             if (isEditing) {
                 response = await fetch(`${API_URL}/${currentProduct._id}`, {
                     method: 'PUT',
@@ -90,13 +102,17 @@ const ProductManager = () => {
             }
 
             if (response.ok) {
+                console.log('[ProductManager] Product saved successfully');
                 fetchProducts(); // Refresh list
                 setIsFormVisible(false);
             } else {
-                alert('Error saving product');
+                const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                console.error(`[ProductManager] Save failed. Status: ${response.status}`, errorData);
+                alert(`પ્રોડક્ટ સેવ કરવામાં નિષ્ફળતા: ${errorData.error}`);
             }
         } catch (error) {
-            console.error('Error saving product:', error);
+            console.error('[ProductManager] CRITICAL ERROR: handleSubmit failed.', error);
+            alert(`ભૂલ આવી: ${error.message}`);
         } finally {
             setIsSubmitting(false);
         }

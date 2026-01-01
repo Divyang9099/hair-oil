@@ -12,13 +12,7 @@ const LandingPage = ({ isDarkMode, setIsDarkMode, serverStatus }) => {
     const [partialOrder, setPartialOrder] = useState(null);
 
     const handleOpenLeadPopup = () => {
-        // setIsLeadPopupOpen(true); // Removed popup step
-
-        // Scroll directly to order section
-        const orderSection = document.getElementById('order');
-        if (orderSection) {
-            orderSection.scrollIntoView({ behavior: 'smooth' });
-        }
+        setIsLeadPopupOpen(true);
     };
 
     const handleLeadSuccess = (orderData) => {

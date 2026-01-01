@@ -11,6 +11,8 @@ function AdminDashboard({ onLogout }) {
   const [error, setError] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingOrder, setEditingOrder] = useState(null)
 
   useEffect(() => {
     if (activeTab === 'orders') {
@@ -63,8 +65,40 @@ function AdminDashboard({ onLogout }) {
   }
 
   const handleEditClick = (order) => {
-    // For now, just alert. Future: Open a modal to edit
-    alert(`Edit functionality coming soon for order: ${order.name}`);
+    setEditingOrder({ ...order })
+    setIsEditModalOpen(true)
+  }
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/orders/${editingOrder._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editingOrder),
+      })
+
+      if (response.ok) {
+        alert('Order updated successfully')
+        setIsEditModalOpen(false)
+        fetchOrders()
+      } else {
+        alert('Failed to update order')
+      }
+    } catch (error) {
+      console.error('Error updating order:', error)
+      alert('Error updating order')
+    }
+  }
+
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target
+    setEditingOrder(prev => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   const handleStatusChange = async (orderId, currentStatus) => {
@@ -665,7 +699,69 @@ function AdminDashboard({ onLogout }) {
                 </>
               )}
             </div>
+
           </motion.div>
+
+          {/* Edit Modal */}
+          {isEditModalOpen && editingOrder && (
+            <div className="modal-overlay" style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex',
+              justifyContent: 'center', alignItems: 'center', zIndex: 10000
+            }}>
+              <motion.div
+                className="modal-content"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                style={{
+                  background: 'white', padding: '2rem', borderRadius: '15px',
+                  width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto',
+                  border: '4px solid var(--deep-green)'
+                }}
+              >
+                <h2 style={{ color: 'var(--deep-green)', marginBottom: '1.5rem', textAlign: 'center' }}>ઓર્ડર સુધારો (Edit Order)</h2>
+                <form onSubmit={handleSaveEdit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label>નામ:</label>
+                    <input type="text" name="name" value={editingOrder.name || ''} onChange={handleEditFormChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>ઇમેઇલ:</label>
+                    <input type="email" name="email" value={editingOrder.email || ''} onChange={handleEditFormChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>ફોન:</label>
+                    <input type="text" name="phone" value={editingOrder.phone || ''} onChange={handleEditFormChange} />
+                  </div>
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label>સરનામું:</label>
+                    <textarea name="address" value={editingOrder.address || ''} onChange={handleEditFormChange} style={{ height: '80px' }} />
+                  </div>
+                  <div className="form-group">
+                    <label>બાટલી કદ:</label>
+                    <input type="text" name="bottleSize" value={editingOrder.bottleSize || ''} onChange={handleEditFormChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>પ્રમાણ:</label>
+                    <input type="number" name="quantity" value={editingOrder.quantity || 0} onChange={handleEditFormChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>એકમ ભાવ:</label>
+                    <input type="number" name="price" value={editingOrder.price || 0} onChange={handleEditFormChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>કુલ રકમ:</label>
+                    <input type="number" name="total" value={editingOrder.total || 0} onChange={handleEditFormChange} />
+                  </div>
+
+                  <div style={{ gridColumn: 'span 2', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                    <button type="button" onClick={() => setIsEditModalOpen(false)} style={{ flex: 1, background: '#ccc', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>રદ કરો</button>
+                    <button type="submit" style={{ flex: 1, background: 'var(--deep-green)', color: 'white', border: 'none', padding: '10px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>સાચવો (Save)</button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
         </>
       )}
     </motion.div>

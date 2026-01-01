@@ -43,6 +43,30 @@ function AdminDashboard({ onLogout }) {
     onLogout()
   }
 
+  const handleDeleteClick = async (orderId) => {
+    if (window.confirm('Are you sure you want to delete this order?')) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          alert('Order deleted successfully');
+          fetchOrders();
+        } else {
+          alert('Failed to delete order');
+        }
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        alert('Error deleting order');
+      }
+    }
+  }
+
+  const handleEditClick = (order) => {
+    // For now, just alert. Future: Open a modal to edit
+    alert(`Edit functionality coming soon for order: ${order.name}`);
+  }
+
   const handleStatusChange = async (orderId, currentStatus) => {
     if (!orderId) {
       console.error('Order ID is missing:', orderId)
@@ -605,6 +629,10 @@ function AdminDashboard({ onLogout }) {
                                   transition={{ duration: 0.3 }}
                                 />
                               </motion.label>
+                              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                <button className="btn-edit" onClick={() => handleEditClick(order)} style={{ background: '#f0ad4e', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>✏️</button>
+                                <button className="btn-delete" onClick={() => handleDeleteClick(order._id)} style={{ background: '#d9534f', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>🗑️</button>
+                              </div>
                             </td>
                           </motion.tr>
                         ))}

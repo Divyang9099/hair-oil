@@ -191,8 +191,8 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
                                 <input type="text" id="name" name="name" required placeholder="તમારું પૂર્ણ નામ લખો" value={formData.name} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="email">ઇમેઇલ *</label>
-                                <input type="email" id="email" name="email" required placeholder="તમારો ઇમેઇલ લખો" value={formData.email} onChange={handleInputChange} />
+                                <label htmlFor="email">ઇમેઇલ (વૈકલ્પિક)</label>
+                                <input type="email" id="email" name="email" placeholder="તમારો ઇમેઇલ લખો" value={formData.email} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="phone">ફોન નંબર *</label>

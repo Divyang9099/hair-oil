@@ -153,59 +153,66 @@ app.put('/api/orders/:id', async (req, res) => {
                     <p>Dear <b>${updatedOrder.name || 'Customer'}</b>,</p>
                     <p>Your order for <b>${updatedOrder.bottleSize}</b> hair oil has been marked as <b>Completed</b>.</p>
                     <p>Your medicine will be safely developed and delivered within <b>7 days</b>.</p>
-                    <p>Total amount paid/due: ₹${updatedOrder.total}</p>
+                    <p>Total amount: ₹${updatedOrder.total}</p>
+                    <hr/>
                     <p>Thank you for choosing Gujarati Divyang!</p>
                 </div>
             `;
 
-            // Function to try Gmail Fallback
-            const tryGmailFallback = async () => {
-                if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-                    console.log("[Email] Fallback: Attempting Gmail SMTP...");
-                    const transporter = nodemailer.createTransport({
-                        host: 'smtp.gmail.com',
-                        port: 587,
-                        secure: false,
-                        auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-                        connectionTimeout: 3000,
-                        family: 4
-                    });
+            const sendEmail = async () => {
+                // PRIMARY: BREVO API (300 Free Emails/Day - Sends to any customer)
+                if (process.env.BREVO_API_KEY) {
                     try {
-                        await transporter.sendMail({
-                            from: process.env.EMAIL_USER,
-                            to: updatedOrder.email,
-                            subject: emailSubject,
-                            html: emailHtml
+                        console.log("[Email] Sending direct via Brevo API...");
+                        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+                            method: 'POST',
+                            headers: {
+                                'accept': 'application/json',
+                                'api-key': process.env.BREVO_API_KEY,
+                                'content-type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                sender: { name: "Gujarati Divyang", email: process.env.EMAIL_USER || "divyang.softcolon@gmail.com" },
+                                to: [{ email: updatedOrder.email }],
+                                subject: emailSubject,
+                                htmlContent: emailHtml
+                            })
                         });
-                        console.log("[Email] SUCCESS: Sent via Gmail.");
-                    } catch (e) {
-                        console.error("[Email] CRITICAL: Gmail fallback also failed.", e.message);
+                        
+                        const result = await response.json();
+                        if (response.ok) {
+                            console.log("[Email] SUCCESS: Sent via Brevo API", result.messageId);
+                            return;
+                        }
+                        console.error("[Email] Brevo API Error:", result);
+                    } catch (e) { 
+                        console.error("[Email] Brevo Connection Error:", e.message); 
                     }
+                }
+
+                // FALLBACK: GMAIL SMTP (Only if Brevo is not configured or fails)
+                if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+                    try {
+                        console.log("[Email] Falling back to Gmail SMTP...");
+                        const transporter = nodemailer.createTransport({
+                            host: 'smtp.gmail.com', port: 587, secure: false,
+                            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+                            connectionTimeout: 3000, family: 4
+                        });
+                        await transporter.sendMail({
+                            from: process.env.EMAIL_USER, to: updatedOrder.email,
+                            subject: emailSubject, html: emailHtml
+                        });
+                        console.log("[Email] SUCCESS: Sent via Gmail SMTP backup.");
+                    } catch (e) { 
+                        console.error("[Email] CRITICAL: All email methods failed.", e.message); 
+                    }
+                } else if (!process.env.BREVO_API_KEY) {
+                    console.warn("[Email] ERROR: No email provider (Brevo or Gmail) is configured in environment variables.");
                 }
             };
 
-            // --- PRIMARY: RESEND API (Fast & Unblocked) ---
-            if (process.env.RESEND_API_KEY) {
-                try {
-                    console.log("[Email] Primary: Sending via Resend API...");
-                    const { Resend } = require('resend');
-                    const resend = new Resend(process.env.RESEND_API_KEY);
-                    const { data, error } = await resend.emails.send({
-                        from: 'onboarding@resend.dev',
-                        to: updatedOrder.email,
-                        subject: emailSubject,
-                        html: emailHtml,
-                    });
-                    if (error) throw error;
-                    console.log(`[Email] SUCCESS: Primary email sent via Resend. ID: ${data.id}`);
-                } catch (err) {
-                    console.error("[Email] Primary (Resend) failed:", err.message);
-                    await tryGmailFallback();
-                }
-            } else {
-                console.log("[Email] RESEND_API_KEY not found. Trying Gmail as primary.");
-                await tryGmailFallback();
-            }
+            await sendEmail();
         }
 
         res.status(200).json({ order: updatedOrder });

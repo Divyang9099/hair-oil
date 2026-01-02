@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const AboutSection = () => {
+    const { t } = useTranslation();
     const [videoEmbedUrl, setVideoEmbedUrl] = useState('');
 
     const handleVideoClick = () => {
@@ -17,7 +19,7 @@ const AboutSection = () => {
                 const videoId = videoUrl.split('vimeo.com/')[1].split('?')[0];
                 embedUrl = `https://player.vimeo.com/video/${videoId}`;
             } else {
-                alert('કૃપા કરીને માન્ય YouTube અથવા Vimeo URL દાખલ કરો.');
+                alert(t('about.video_error'));
                 return;
             }
             setVideoEmbedUrl(embedUrl);
@@ -34,10 +36,10 @@ const AboutSection = () => {
             transition={{ duration: 0.8 }}
         >
             <div className="container">
-                <h2 className="section-title">૨૦ વર્ષની શુદ્ધતા અને વિશ્વાસ</h2>
+                <h2 className="section-title">{t('about.title')}</h2>
                 <div className="about-content">
                     <motion.p className="about-text" initial={{ x: -50, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6 }}>
-                        Kesh Rasayana માત્ર એક પ્રોડક્ટ નથી, તે અમારા પરિવારની ૨૦ વર્ષની મહેનત અને પરંપરાનો વારસો છે. અંબાલાના અનુભવી વૈદ્ય દ્વારા તૈયાર કરવામાં આવેલું આ તેલ શુદ્ધ આયુર્વેદિક ઘટકો સાથે બનાવવામાં આવે છે.
+                        {t('about.desc')}
                     </motion.p>
                     <motion.div className="video-placeholder" initial={{ x: 50, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6, delay: 0.2 }}>
                         <div className="video-container" onClick={handleVideoClick}>
@@ -46,7 +48,7 @@ const AboutSection = () => {
                             ) : (
                                 <motion.div className="video-placeholder-content" whileHover={{ scale: 1.03 }}>
                                     <div className="play-button">▶</div>
-                                    <div className="video-title">જુઓ! શુદ્ધ તેલ બનાવવાની પ્રક્રિયા</div>
+                                    <div className="video-title">{t('about.video_title')}</div>
                                 </motion.div>
                             )}
                         </div>

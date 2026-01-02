@@ -1,0 +1,204 @@
+.truck-button {
+    --color: #fff;
+    --background: #3b82f6;
+    /* Matching your Tech Blue */
+    --background-success: #22c55e;
+    /* Vibrant Success Green */
+    --truck: #f1f5f9;
+    --wheel: #94a3b8;
+    --wheel-inner: #475569;
+    --box: #d97706;
+    --check: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    padding: 12px 0;
+    border-radius: 8px;
+    border: none;
+    background: var(--background);
+    color: var(--color);
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 1.1rem;
+    overflow: hidden;
+    transition: background 0.4s;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.truck-button .default,
+.truck-button .success {
+    display: block;
+    transition: transform 0.4s, opacity 0.3s;
+}
+
+.truck-button .success {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(40px);
+    opacity: 0;
+    z-index: 2;
+}
+
+.truck-button .truck {
+    position: absolute;
+    height: 24px;
+    width: 72px;
+    z-index: 1;
+    top: 50%;
+    left: -72px;
+    transform: translateY(-50%);
+}
+
+.truck-button .truck:before,
+.truck-button .truck:after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--wheel);
+    box-shadow: 40px 0 0 var(--wheel);
+}
+
+.truck-button .truck:after {
+    left: 14px;
+    width: 4px;
+    height: 4px;
+    background: var(--wheel-inner);
+    box-shadow: 40px 0 0 var(--wheel-inner);
+    bottom: -2px;
+}
+
+.truck-button .truck .cab {
+    position: absolute;
+    left: 44px;
+    bottom: 0;
+    width: 24px;
+    height: 18px;
+    background: var(--truck);
+    border-radius: 3px 6px 3px 3px;
+}
+
+.truck-button .truck .cab:before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
+    background: var(--background);
+    border-radius: 1px;
+}
+
+.truck-button .truck .box {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 42px;
+    height: 22px;
+    background: var(--truck);
+    border-radius: 3px;
+}
+
+.truck-button .truck .box:before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 14px;
+    height: 10px;
+    background: var(--box);
+    border-radius: 1px;
+}
+
+.truck-button.animation {
+    background: var(--background);
+}
+
+.truck-button.animation .default {
+    opacity: 0;
+    transform: translateY(-40px);
+}
+
+.truck-button.animation .truck {
+    animation: truck 4s ease forwards;
+}
+
+.truck-button.animation .truck:before,
+.truck-button.animation .truck:after {
+    animation: wheel 4s ease forwards;
+}
+
+.truck-button.animation .success {
+    opacity: 1;
+    transform: translateY(-50%);
+    transition-delay: 3.4s;
+}
+
+@keyframes truck {
+    10% {
+        left: 0;
+    }
+
+    20%,
+    30% {
+        left: 10px;
+    }
+
+    40% {
+        left: 20px;
+    }
+
+    50%,
+    60% {
+        left: 40px;
+    }
+
+    70% {
+        left: 80px;
+    }
+
+    80% {
+        left: 120px;
+    }
+
+    90% {
+        left: 160px;
+    }
+
+    100% {
+        left: 240px;
+    }
+}
+
+@keyframes wheel {
+
+    10%,
+    20%,
+    30%,
+    40%,
+    50%,
+    60%,
+    70%,
+    80%,
+    90%,
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.truck-button.done {
+    background: var(--background-success);
+}
+
+.truck-button.done .default {
+    display: none;
+}

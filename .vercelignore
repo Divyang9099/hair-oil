@@ -1,0 +1,9 @@
+node_modules
+frontend/my-react-app/node_modules
+.git
+.vercel
+dist
+frontend/my-react-app/dist
+.env
+.env.local
+.env.*.local

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import API_BASE_URL from '../config';
 
 const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,12 +24,12 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
         setError('');
 
         if (!validateEmail(email)) {
-            setError('કૃપા કરીને માન્ય ઇમેઇલ દાખલ કરો.');
+            setError(t('lead.email_error'));
             return;
         }
 
         if (!validatePhone(phone)) {
-            setError('કૃપા કરીને માન્ય મોબાઈલ નંબર દાખલ કરો (૧૦ અંક).');
+            setError(t('lead.phone_error'));
             return;
         }
 
@@ -51,11 +53,11 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
             } else {
                 const errorData = await response.json().catch(() => ({ error: 'Unknown Error' }));
                 console.error(`[LeadPopup] Failed to capture lead. Status: ${response.status}`, errorData);
-                setError(errorData.error || 'માહિતી સેવ કરવામાં ભૂલ આવી. ફરી પ્રયાસ કરો.');
+                setError(errorData.error || t('lead.save_error'));
             }
         } catch (err) {
             console.error('[LeadPopup] CRITICAL ERROR: handleSubmit failed.', err);
-            setError(`સર્વર સાથે કનેક્શન નથી: ${err.message}`);
+            setError(t('lead.server_error', { message: err.message }));
         } finally {
             setIsSubmitting(false);
         }
@@ -87,15 +89,15 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
                         textAlign: 'center'
                     }}
                 >
-                    <h3 style={{ color: 'var(--deep-green)', marginBottom: '1rem' }}>તમારી વિગતો જણાવો</h3>
+                    <h3 style={{ color: 'var(--deep-green)', marginBottom: '1rem' }}>{t('lead.title')}</h3>
                     <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
-                        ઓર્ડર કરવા માટે કૃપા કરીને તમારો મોબાઈલ નંબર અને ઇમેઇલ દાખલ કરો.
+                        {t('lead.subtitle')}
                     </p>
 
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <input
                             type="email"
-                            placeholder="તમારો ઇમેઇલ (Email)"
+                            placeholder={t('lead.email_placeholder')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -103,7 +105,7 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
                         />
                         <input
                             type="tel"
-                            placeholder="તમારો મોબાઈલ નંબર"
+                            placeholder={t('lead.phone_placeholder')}
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             maxLength="10"
@@ -120,7 +122,7 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
                                 className="btn-logout"
                                 style={{ flex: 1, margin: 0, padding: '0.8rem' }}
                             >
-                                રદ કરો
+                                {t('lead.cancel')}
                             </button>
                             <button
                                 type="submit"
@@ -128,7 +130,7 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
                                 style={{ flex: 1, padding: '0.8rem' }}
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? 'પ્રોસેસિંગ...' : 'આગળ વધો'}
+                                {isSubmitting ? t('lead.processing') : t('lead.submit')}
                             </button>
                         </div>
                     </form>

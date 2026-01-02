@@ -1,29 +1,21 @@
 {
   "name": "gujarati-divyang",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "build": "npm run build --prefix frontend/my-react-app",
-    "install": "npm install && npm install --prefix frontend/my-react-app",
-    "deploy": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Update website'; git push\"",
-    "deploy:quick": "powershell -Command \"cd frontend/my-react-app; git add .; git commit -m 'Quick update'; git push\""
+    "start": "node backend/src/server.js",
+    "backend": "npm start --prefix backend",
+    "frontend": "npm start --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "install-all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "vercel-build": "npm run build --prefix frontend"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "aos": "^2.3.4",
     "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "i18next": "^25.7.0",
     "mongoose": "^8.19.3",
-    "nodemailer": "^7.0.12",
-    "react-i18next": "^16.3.5"
+    "nodemailer": "^7.0.12"
   }
 }

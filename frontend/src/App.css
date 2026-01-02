@@ -130,6 +130,28 @@ body.light-mode .btn-primary {
   }
 }
 
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes buttonGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
 /* HEADER - RESTORED ORIGINAL LAYOUT */
 /* HEADER - FLOATING ISLAND STYLE */
 header {
@@ -210,6 +232,94 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-desktop-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 1.5rem;
+}
+
+.lang-select {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-dark);
+  border: 1px solid var(--glass-border);
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.lang-select:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--deep-green);
+}
+
+body.light-mode .lang-select {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .lang-select option {
+  background: white;
+  color: black;
+}
+
+.lang-select option {
+  background: #0f172a;
+  color: white;
+}
+
+.hamburger {
+  display: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 5px;
+  z-index: 1001;
+}
+
+.hamburger .bar {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: var(--text-dark);
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger.active .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active .bar:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
 }
 
 /* --- HERO SECTION: BACKGROUND IMAGE & TEXT --- */
@@ -276,18 +386,45 @@ nav {
 
 /* BUTTONS */
 .btn-primary {
-  background-color: var(--deep-green);
+  background: linear-gradient(135deg, var(--deep-green) 0%, var(--light-green) 100%);
   color: white;
-  padding: 0.8rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
+  padding: 1rem 3rem;
+  font-size: 1.25rem;
+  font-weight: 700;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-  animation: pulseGlow 2s infinite;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+  animation: buttonGlow 3s infinite;
+}
+
+.btn-primary:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-25deg);
+  animation: shimmer 3s infinite;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -594,14 +731,7 @@ footer::before {
 }
 
 
-
-.order-section .section-title {
-  /* color: inherit !important; */
-}
-
-.order-section .form-group label {
-  /* color: inherit !important; */
-}
+/* Cleaned up empty rules */
 
 body.light-mode footer {
   /* Keep the same image but maybe adjust overlay or text color? */
@@ -906,33 +1036,120 @@ body.light-mode footer::before {
 /* Mobile Landscape & Tablets (Portrait) */
 @media (max-width: 768px) {
   .container {
-    padding: 0 1.5rem;
-    /* Ensure content doesn't touch edges */
+    padding: 0 0.5rem;
+    /* Minimized to allow logo to sit flush on mobile */
   }
 
-  /* Navigation: Stack vertically */
+  /* Navigation: Maintain Row for Logo and Hamburger */
   nav {
-    flex-direction: column;
-    gap: 1rem;
-    padding-bottom: 0.5rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    /* Prevent icons from wrapping below logo */
+    gap: 0.5rem;
+    padding-bottom: 0;
+  }
+
+  header {
+    padding: 0.6rem 0.2rem;
+    /* Pushed logo to absolute left edge */
+  }
+
+  .logo {
+    font-size: 1.2rem;
+    /* Scaled down for mobile */
+    min-width: 0;
+    /* Allow shrinking */
+    flex-shrink: 1;
+  }
+
+  .logo img {
+    height: 30px !important;
+    /* Smaller logo image */
+  }
+
+  .nav-controls {
+    flex-shrink: 0;
+    /* Don't shrink the icons */
+    gap: 0.8rem;
+  }
+
+  .theme-toggle-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+  }
+
+  .hamburger {
+    display: flex;
+    padding: 2px;
+  }
+
+  .hamburger .bar {
+    width: 22px;
+  }
+
+  .mobile-only {
+    display: flex;
+  }
+
+  .desktop-only {
+    display: none;
   }
 
   .nav-links {
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
-    padding: 0;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 250px;
+    height: 100vh;
+    background: #0f172a;
+    /* Solid Navy Background */
+    flex-direction: column;
+    padding: 80px 2rem 2rem;
     gap: 1rem;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    border-left: 2px solid var(--deep-green);
+  }
+
+  .nav-links.active {
+    right: 0;
   }
 
   .nav-links li {
+    width: 100%;
     text-align: center;
+  }
+
+  .nav-links a {
+    font-size: 1.2rem;
+    display: block;
+    padding: 0.8rem;
+    color: var(--text-dark);
+    font-weight: 500;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+  }
+
+  .nav-links a:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  body.light-mode .nav-links a:hover {
+    background: rgba(0, 100, 0, 0.05);
+  }
+
+  .nav-controls .theme-toggle-btn {
+    border-color: var(--text-dark);
   }
 
   /* Hero Section: Centered Text & Gradient Background */
   .hero-section {
-    /* FIX: Force high top padding on mobile to clear the stacked navbar */
-    padding: 180px 0 4rem 0;
+    /* Adjusted padding now that navbar is single-row */
+    padding: 100px 0 4rem 0;
     min-height: 60vh;
     display: flex;
     align-items: center;

@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { containerVariants, itemVariants } from '../utils/animations';
 
 const HeroSection = ({ onOrderClick }) => {
+    const { t } = useTranslation();
+
     return (
         <section id="home" className="hero-section">
             <div className="hero-bg-wrapper">
@@ -17,10 +20,10 @@ const HeroSection = ({ onOrderClick }) => {
                     animate="visible"
                 >
                     <motion.h1 variants={itemVariants}>
-                        Kesh Rasayana: ૨૦ વર્ષનો અનુભવ, અંબાલાની ઔષધીઓનો વારસો
+                        {t('hero.title')}
                     </motion.h1>
                     <motion.p className="sub-headline" variants={itemVariants}>
-                        ખરતા વાળ, ખોડો, અને ઉંદરી જેવી સમસ્યાઓ માટે આયુર્વેદિક ઉપચાર.
+                        {t('hero.subtitle')}
                     </motion.p>
                     <motion.button
                         onClick={onOrderClick}
@@ -30,7 +33,7 @@ const HeroSection = ({ onOrderClick }) => {
                         whileTap={{ scale: 0.95 }}
                         style={{ border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: '1rem 2rem' }}
                     >
-                        હમણાં જ ઓર્ડર કરો
+                        {t('hero.button')}
                     </motion.button>
                 </motion.div>
             </div>

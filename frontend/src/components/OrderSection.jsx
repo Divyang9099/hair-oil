@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cardVariants } from '../utils/animations';
 import '../ProductSelection.css';
-
 import API_BASE_URL from '../config';
+import TruckButton from './TruckButton';
+import { useTranslation } from 'react-i18next';
 
 const OrderSection = ({ serverStatus, partialOrder }) => {
+    const { t } = useTranslation();
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
@@ -89,11 +91,10 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
     };
 
     const handleFormSubmit = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         if (!validateMobileNumber(formData.phone)) {
-            alert('કૃપા કરીને માન્ય મોબાઇલ નંબર દાખલ કરો.\nમોબાઇલ નંબર 10 અંકનો હોવો જોઈએ અને 6, 7, 8 અથવા 9 થી શરૂ થવો જોઈએ.\nઉદાહરણ: 9876543210');
-            setIsSubmitting(false);
-            return;
+            alert(t('order.phone_error'));
+            return false;
         }
 
         setIsSubmitting(true);
@@ -136,15 +137,18 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
                 setFormData({ name: '', email: '', phone: '', address: '', bottleSize: products[0]?.size || '', quantity: 1 });
                 setTimeout(() => {
                     setShowSuccessMessage(false);
-                }, 5000);
+                }, 8000);
+                return true;
             } else {
                 const errorData = await response.json().catch(() => ({ error: 'Unknown server error' }));
                 console.error(`[OrderSection] Order failed. Status: ${response.status}`, errorData);
                 alert(`ઓર્ડર આપવામાં ભૂલ: ${errorData.error || 'સર્વરમાં સમસ્યા આવી'}`);
+                return false;
             }
         } catch (error) {
             console.error('[OrderSection] CRITICAL ERROR: handleFormSubmit failed.', error);
             alert(`સર્વર સાથે કનેક્શન નથી: ${error.message}`);
+            return false;
         } finally {
             setIsSubmitting(false);
         }
@@ -153,11 +157,15 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
     return (
         <section id="order" className="section order-section">
             <div className="container">
-                <motion.h2 className="section-title" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>ઓર્ડર કરો</motion.h2>
+                <motion.h2 className="section-title" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>
+                    {t('order.title')}
+                </motion.h2>
                 <div className="order-container">
                     {/* Product Selection Grid (Left Side) */}
                     <div className="product-selection-container">
-                        <h3 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--text-dark)' }}>પૅક પસંદ કરો</h3>
+                        <h3 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--text-dark)' }}>
+                            {t('order.size')}
+                        </h3>
                         <div className="product-grid-vertical">
                             {products.length === 0 ? (
                                 <p style={{ textAlign: 'center' }}>Loading products...</p>
@@ -187,26 +195,28 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
                     </div>
 
                     <motion.div className="order-form" variants={cardVariants} initial="initial" whileInView="animate" viewport={{ once: true }}>
-                        <h3 style={{ color: 'var(--deep-green)', marginBottom: '1.5rem', textAlign: 'center', fontSize: '1.5rem' }}>ઓર્ડર ફોર્મ</h3>
+                        <h3 style={{ color: 'var(--deep-green)', marginBottom: '1.5rem', textAlign: 'center', fontSize: '1.5rem' }}>
+                            {t('order.title')}
+                        </h3>
                         <form id="orderForm" onSubmit={handleFormSubmit}>
                             <div className="form-group">
-                                <label htmlFor="name">નામ *</label>
-                                <input type="text" id="name" name="name" required placeholder="તમારું પૂર્ણ નામ લખો" value={formData.name} onChange={handleInputChange} />
+                                <label htmlFor="name">{t('order.name')} *</label>
+                                <input type="text" id="name" name="name" required value={formData.name} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="email">ઇમેઇલ (વૈકલ્પિક)</label>
-                                <input type="email" id="email" name="email" placeholder="તમારો ઇમેઇલ લખો" value={formData.email} onChange={handleInputChange} />
+                                <label htmlFor="email">Email (Optional)</label>
+                                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="phone">ફોન નંબર *</label>
-                                <input type="tel" id="phone" name="phone" required placeholder="તમારો ફોન નંબર લખો" value={formData.phone} onChange={handleInputChange} maxLength="10" />
+                                <label htmlFor="phone">{t('order.phone')} *</label>
+                                <input type="tel" id="phone" name="phone" required value={formData.phone} onChange={handleInputChange} maxLength="10" />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="address">સરનામું *</label>
-                                <textarea id="address" name="address" required placeholder="તમારું સંપૂર્ણ સરનામું લખો" value={formData.address} onChange={handleInputChange} />
+                                <label htmlFor="address">{t('order.address')} *</label>
+                                <textarea id="address" name="address" required value={formData.address} onChange={handleInputChange} />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="bottleSize">બાટલીનું કદ *</label>
+                                <label htmlFor="bottleSize">{t('order.size')} *</label>
                                 <select id="bottleSize" name="bottleSize" required value={formData.bottleSize} onChange={handleInputChange} style={{ width: '100%', padding: '0.8rem', border: '2px solid var(--deep-green)', borderRadius: '5px' }}>
                                     {products.map((product) => (
                                         <option key={product._id} value={product.size}>
@@ -216,21 +226,25 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="quantity">પ્રમાણ *</label>
-                                <input type="number" id="quantity" name="quantity" required min="1" placeholder="પ્રમાણ દાખલ કરો" value={formData.quantity} onChange={handleInputChange} />
+                                <label htmlFor="quantity">{t('order.quantity')} *</label>
+                                <input type="number" id="quantity" name="quantity" required min="1" value={formData.quantity} onChange={handleInputChange} />
                             </div>
                             <div className="form-group" style={{ marginBottom: '1rem', padding: '1rem', background: 'var(--cream-beige)', borderRadius: '5px', border: '2px solid var(--deep-green)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ fontWeight: 600, color: 'var(--deep-green)' }}>કુલ રકમ:</span>
+                                    <span style={{ fontWeight: 600, color: 'var(--deep-green)' }}>{t('order.total')}:</span>
                                     <span style={{ fontWeight: 700, color: 'var(--deep-green)', fontSize: '1.2rem' }}>₹{calculateTotal()}</span>
                                 </div>
                             </div>
-                            <motion.button type="submit" className="btn-secondary" disabled={isSubmitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                {isSubmitting
-                                    ? (serverStatus !== 'ready' ? 'Connecting to server...' : 'પ્રક્રિયા ચાલી રહી છે...')
-                                    : 'ઓર્ડર કન્ફર્મ કરો'}
-                            </motion.button>
-                            {showSuccessMessage && <motion.div className="success-message" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>✅ ધન્યવાદ! તમારો ઓર્ડર પ્રાપ્ત થયો છે.</motion.div>}
+                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
+                                <TruckButton
+                                    onClick={handleFormSubmit}
+                                    isSubmitting={isSubmitting}
+                                    disabled={serverStatus !== 'ready'}
+                                    defaultText={serverStatus !== 'ready' ? t('order.connecting') : t('order.confirm')}
+                                    successText={t('order.success')}
+                                />
+                            </div>
+                            {showSuccessMessage && <motion.div className="success-message" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{t('order.message')}</motion.div>}
                         </form>
                     </motion.div>
                 </div>

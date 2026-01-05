@@ -314,12 +314,31 @@ body.light-mode .lang-select option {
   transform: translateY(-9px) rotate(-45deg);
 }
 
-.mobile-only {
-  display: none;
+/* --- MOBILE MENU OVERLAY FIX --- */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .desktop-only {
   display: block;
+}
+
+.desktop-only-flex {
+  display: flex;
+}
+
+.mobile-only {
+  display: none;
 }
 
 /* --- HERO SECTION: BACKGROUND IMAGE & TEXT --- */

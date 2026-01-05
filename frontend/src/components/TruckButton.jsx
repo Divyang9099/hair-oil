@@ -18,6 +18,12 @@ const TruckButton = ({ onClick, isSubmitting, defaultText = "ઓર્ડર ક
             setTimeout(() => {
                 setDone(true);
                 setAnimation(false);
+
+                // Reset after showing 'Success' for 5 seconds
+                setTimeout(() => {
+                    setDone(false);
+                }, 5000);
+
             }, 4000);
         } else {
             // If failed, reset immediately

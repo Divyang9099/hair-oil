@@ -45,17 +45,9 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                     Kesh Rasayana
                 </motion.a>
 
-                {/* Dark Mode Toggle near Brand Name */}
-                <button
-                    className="theme-toggle-btn nav-brand-toggle"
-                    onClick={() => setIsDarkMode(!isDarkMode)}
-                    title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                >
-                    {isDarkMode ? '☀️' : '🌙'}
-                </button>
-
-                {/* Mobile Controls */}
+                {/* Desktop/Mobile Common Controls */}
                 <div className="nav-controls">
+                    {/* Mobile Only: Lang select and Hamburger */}
                     <select
                         className="lang-select mobile-only"
                         onChange={(e) => changeLanguage(e.target.value)}
@@ -145,6 +137,16 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                                 <option value="gu">Gujarati</option>
                                 <option value="en">English</option>
                             </select>
+
+                            {/* Desktop Dark Mode Toggle - Near Language button */}
+                            <button
+                                className="theme-toggle-btn desktop-only-flex"
+                                onClick={() => setIsDarkMode(!isDarkMode)}
+                                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                                style={{ marginLeft: '10px' }}
+                            >
+                                {isDarkMode ? '☀️' : '🌙'}
+                            </button>
                         </div>
                     </li>
 

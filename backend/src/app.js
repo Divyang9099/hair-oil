@@ -16,12 +16,10 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
+const { captureLead } = require('./controllers/orderController');
+// Routes
 app.use('/api/orders', orderRoutes);
-app.use('/api/leads', (req, res, next) => {
-    // Mapping existing /api/leads to orderRoutes.js logic
-    req.url = '/leads';
-    next();
-}, orderRoutes);
+app.post('/api/leads', captureLead);
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
 

@@ -66,8 +66,10 @@ exports.createOrder = async (req, res) => {
         });
 
         const savedOrder = await order.save();
+        console.log(`[DB_SUCCESS] NEW ORDER stored in database: "${mongoose.connection.name}", collection: "orders", ID: ${savedOrder._id}`);
         res.status(201).json({ order: savedOrder });
     } catch (err) {
+        console.error(`[DB_ERROR] NEW ORDER failed in database: "${mongoose.connection.name}"`, err);
         res.status(500).json({ error: 'ઓર્ડર બનાવવામાં સમસ્યા આવી', details: err.message });
     }
 };
@@ -88,6 +90,7 @@ exports.updateOrder = async (req, res) => {
         }
 
         const updatedOrder = await Order.findByIdAndUpdate(id, req.body, { new: true });
+        console.log(`[DB_SUCCESS] ORDER UPDATED in database: "${mongoose.connection.name}", ID: ${id}`);
 
         const newStatus = req.body.status === true || req.body.status === 'true';
         const oldStatus = existingOrder.status === true || existingOrder.status === 'true';

@@ -47,6 +47,15 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
 
                 {/* Desktop/Mobile Common Controls */}
                 <div className="nav-controls">
+                    {/* Theme Toggle - Visible on Mobile and Desktop */}
+                    <button
+                        className="theme-toggle-btn"
+                        onClick={() => setIsDarkMode(!isDarkMode)}
+                        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    >
+                        {isDarkMode ? '☀️' : '🌙'}
+                    </button>
+
                     {/* Mobile Only: Lang select and Hamburger */}
                     <select
                         className="lang-select mobile-only"
@@ -137,16 +146,6 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                                 <option value="gu">Gujarati</option>
                                 <option value="en">English</option>
                             </select>
-
-                            {/* Desktop Dark Mode Toggle - Near Language button */}
-                            <button
-                                className="theme-toggle-btn desktop-only-flex"
-                                onClick={() => setIsDarkMode(!isDarkMode)}
-                                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                                style={{ marginLeft: '10px' }}
-                            >
-                                {isDarkMode ? '☀️' : '🌙'}
-                            </button>
                         </div>
                     </li>
 

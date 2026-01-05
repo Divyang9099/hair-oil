@@ -164,19 +164,19 @@ header {
   /* Remove rounded corners for full bar */
 
   /* Backgrounds & Glass Effect */
-  background: rgba(15, 23, 42, 0.8);
-  /* Semi-transparent Dark */
+  background: #0f172a;
+  /* Solid background for better contrast */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid var(--deep-green);
+  /* Add a bottom border for visibility */
 
   /* Fixed to Top */
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-  /* Deep Shadow */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 
   /* Spacing */
   padding: 0.8rem 2rem;
@@ -201,10 +201,16 @@ nav {
 .logo {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--deep-green) !important;
+  color: #ffffff !important;
+  /* White in Dark Mode */
   text-decoration: none;
   display: flex;
   align-items: center;
+}
+
+body.light-mode .logo {
+  color: var(--deep-green) !important;
+  /* Green in Light Mode */
 }
 
 .nav-links {

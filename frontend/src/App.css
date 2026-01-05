@@ -1119,7 +1119,8 @@ body.light-mode footer::before {
     display: flex;
   }
 
-  .desktop-only {
+  .desktop-only,
+  .desktop-only-flex {
     display: none;
   }
 

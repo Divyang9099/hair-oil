@@ -92,16 +92,7 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <li className="mobile-menu-header">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <span className="logo-small">Kesh Rasayana</span>
-                                        <button
-                                            className="theme-toggle-btn"
-                                            onClick={() => setIsDarkMode(!isDarkMode)}
-                                            style={{ width: '32px', height: '32px', fontSize: '0.8rem' }}
-                                        >
-                                            {isDarkMode ? '☀️' : '🌙'}
-                                        </button>
-                                    </div>
+                                    <span className="logo-small">Kesh Rasayana</span>
                                     <button className="close-menu" onClick={toggleMenu}>✕</button>
                                 </li>
                                 {navItems.map((item, index) => (
@@ -119,15 +110,12 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                                 ))}
                                 <li className="mobile-menu-footer">
                                     <div className="menu-controls">
-                                        <select
-                                            className="lang-select"
-                                            onChange={(e) => changeLanguage(e.target.value)}
-                                            value={i18n.language}
-                                            style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--text-dark)' }}
+                                        <button
+                                            className="theme-toggle-btn"
+                                            onClick={() => setIsDarkMode(!isDarkMode)}
                                         >
-                                            <option value="gu">ગુજરાતી</option>
-                                            <option value="en">English</option>
-                                        </select>
+                                            {isDarkMode ? '☀️' : '🌙'}
+                                        </button>
                                     </div>
                                 </li>
                             </motion.ul>

@@ -1123,48 +1123,100 @@ body.light-mode footer::before {
     display: none;
   }
 
-  .nav-links {
+  /* --- MOBILE MENU REDESIGN --- */
+  .mobile-menu-overlay {
     position: fixed;
     top: 0;
-    right: -100%;
-    width: 250px;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+  }
+
+  .nav-links.mobile-active {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 280px;
     height: 100vh;
     background: #0f172a;
-    /* Solid Navy Background */
+    /* Deep Navy as per image */
     flex-direction: column;
-    padding: 80px 2rem 2rem;
-    gap: 1rem;
-    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+    gap: 0;
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    border-left: 2px solid var(--deep-green);
+    z-index: 2100;
+    display: flex;
+    overflow-y: auto;
   }
 
-  .nav-links.active {
-    right: 0;
-  }
-
-  .nav-links li {
+  .mobile-menu-header {
+    background: var(--deep-green);
+    /* Bright Blue */
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    text-align: center;
+    margin-bottom: 2rem;
   }
 
-  .nav-links a {
+  .mobile-menu-header .logo-small {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  .close-menu {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+  }
+
+  .nav-links.mobile-active li {
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* Divider lines */
+  }
+
+  .nav-links.mobile-active li a {
+    display: flex;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    color: white;
+    text-decoration: none;
     font-size: 1.2rem;
-    display: block;
-    padding: 0.8rem;
-    color: var(--text-dark);
-    font-weight: 500;
-    border-radius: 8px;
-    transition: background 0.3s ease;
+    font-weight: 600;
+    width: 100%;
+    text-align: left;
+    gap: 1rem;
   }
 
-  .nav-links a:hover {
-    background: rgba(255, 255, 255, 0.1);
+  .nav-icon {
+    font-size: 1.4rem;
   }
 
-  body.light-mode .nav-links a:hover {
-    background: rgba(0, 100, 0, 0.05);
+  .mobile-menu-footer {
+    margin-top: auto;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    border-top: none !important;
+  }
+
+  /* Bottom Theme Toggle */
+  .menu-controls .theme-toggle-btn {
+    width: 60px;
+    height: 60px;
+    border: 2px solid white;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    font-size: 1.5rem;
   }
 
   .nav-controls .theme-toggle-btn {

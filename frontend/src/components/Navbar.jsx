@@ -45,6 +45,15 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                     Kesh Rasayana
                 </motion.a>
 
+                {/* Dark Mode Toggle near Brand Name */}
+                <button
+                    className="theme-toggle-btn nav-brand-toggle"
+                    onClick={() => setIsDarkMode(!isDarkMode)}
+                    title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                >
+                    {isDarkMode ? '☀️' : '🌙'}
+                </button>
+
                 {/* Mobile Controls */}
                 <div className="nav-controls">
                     <select
@@ -57,13 +66,6 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                         <option value="en">English</option>
                     </select>
 
-                    <button
-                        className="theme-toggle-btn mobile-only"
-                        onClick={() => setIsDarkMode(!isDarkMode)}
-                        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                    >
-                        {isDarkMode ? '☀️' : '🌙'}
-                    </button>
                     <button className={`hamburger ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu} aria-label="Menu">
                         <span className="bar"></span>
                         <span className="bar"></span>
@@ -71,7 +73,68 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                     </button>
                 </div>
 
-                <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+                <AnimatePresence>
+                    {isMenuOpen && (
+                        <motion.div
+                            className="mobile-menu-overlay"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={toggleMenu}
+                        >
+                            <motion.ul
+                                className="nav-links mobile-active"
+                                initial={{ x: '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <li className="mobile-menu-header">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <span className="logo-small">Kesh Rasayana</span>
+                                        <button
+                                            className="theme-toggle-btn"
+                                            onClick={() => setIsDarkMode(!isDarkMode)}
+                                            style={{ width: '32px', height: '32px', fontSize: '0.8rem' }}
+                                        >
+                                            {isDarkMode ? '☀️' : '🌙'}
+                                        </button>
+                                    </div>
+                                    <button className="close-menu" onClick={toggleMenu}>✕</button>
+                                </li>
+                                {navItems.map((item, index) => (
+                                    <motion.li
+                                        key={item.href}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.1 * index }}
+                                    >
+                                        <a href={item.href} onClick={() => setIsMenuOpen(false)}>
+                                            <span className="nav-icon">{index === 0 ? '🏠' : index === 1 ? '✨' : index === 2 ? '🌿' : '🛒'}</span>
+                                            {item.label}
+                                        </a>
+                                    </motion.li>
+                                ))}
+                                <li className="mobile-menu-footer">
+                                    <div className="menu-controls">
+                                        <select
+                                            className="lang-select"
+                                            onChange={(e) => changeLanguage(e.target.value)}
+                                            value={i18n.language}
+                                            style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--text-dark)' }}
+                                        >
+                                            <option value="gu">ગુજરાતી</option>
+                                            <option value="en">English</option>
+                                        </select>
+                                    </div>
+                                </li>
+                            </motion.ul>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <ul className="nav-links desktop-only-flex">
                     <li className="desktop-only">
                         <div className="nav-desktop-controls">
                             <select
@@ -82,32 +145,16 @@ const Navbar = ({ isDarkMode, setIsDarkMode }) => {
                                 <option value="gu">Gujarati</option>
                                 <option value="en">English</option>
                             </select>
-
-                            <button
-                                className="theme-toggle-btn"
-                                onClick={() => setIsDarkMode(!isDarkMode)}
-                                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                            >
-                                {isDarkMode ? '☀️' : '🌙'}
-                            </button>
                         </div>
                     </li>
 
                     {navItems.map((item, index) => (
                         <motion.li
                             key={item.href}
-                            initial={{ opacity: 0, x: 30, y: -20 }}
-                            animate={{ opacity: 1, x: 0, y: 0 }}
-                            transition={{
-                                duration: 0.4,
-                                delay: 0.3 + index * 0.1,
-                                type: "spring",
-                                stiffness: 150
-                            }}
                             whileHover={{ scale: 1.1, y: -2 }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <a href={item.href} onClick={() => setIsMenuOpen(false)}>{item.label}</a>
+                            <a href={item.href}>{item.label}</a>
                         </motion.li>
                     ))}
                 </ul>

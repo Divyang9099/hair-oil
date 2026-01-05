@@ -1,13 +1,13 @@
 .truck-button {
     --color: #fff;
-    --background: #3b82f6;
-    /* Matching your Tech Blue */
-    --background-success: #22c55e;
-    /* Vibrant Success Green */
+    --background: var(--deep-green);
+    /* Linked to global theme */
+    --background-success: #10b981;
+    /* Clean Success Green */
     --truck: #f1f5f9;
     --wheel: #94a3b8;
     --wheel-inner: #475569;
-    --box: #d97706;
+    --box: var(--light-green);
     --check: #fff;
     display: flex;
     align-items: center;

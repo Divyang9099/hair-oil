@@ -38,11 +38,10 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/orders`); // Using orders endpoint for compatibility or products endpoint? 
-                // Wait, use the PRODUCT endpoint for products!
-                const prodResponse = await fetch(`${API_BASE_URL}/api/products`);
-                if (prodResponse.ok) {
-                    const data = await prodResponse.json();
+                // Fetch products directly. If server is sleeping, this will trigger wake-up
+                const response = await fetch(`${API_BASE_URL}/api/products`);
+                if (response.ok) {
+                    const data = await response.json();
                     setProducts(data);
                 }
             } catch (error) {
@@ -135,6 +134,7 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
                 console.log('[OrderSection] Order saved successfully:', result);
                 setShowSuccessMessage(true);
                 setFormData({ name: '', email: '', phone: '', address: '', bottleSize: products[0]?.size || '', quantity: 1 });
+                setOrderId(null); // Reset orderId to allow new orders
                 setTimeout(() => {
                     setShowSuccessMessage(false);
                 }, 8000);
@@ -174,7 +174,14 @@ const OrderSection = ({ serverStatus, partialOrder }) => {
                                     <motion.div
                                         key={product._id}
                                         className={`product-card-small ${formData.bottleSize === product.size ? 'selected' : ''}`}
-                                        onClick={() => setFormData(prev => ({ ...prev, bottleSize: product.size }))}
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, bottleSize: product.size }));
+                                            // Scroll to the actual form inputs for easy ordering
+                                            const formElement = document.getElementById('orderForm');
+                                            if (formElement) {
+                                                formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            }
+                                        }}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                     >

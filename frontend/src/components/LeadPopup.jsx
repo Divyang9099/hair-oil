@@ -90,7 +90,7 @@ const LeadPopup = ({ isOpen, onClose, onSuccess }) => {
                     }}
                 >
                     <h3 style={{ color: 'var(--deep-green)', marginBottom: '1rem' }}>{t('lead.title')}</h3>
-                    <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
+                    <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: 'var(--text-dark)', opacity: 0.8 }}>
                         {t('lead.subtitle')}
                     </p>
 
